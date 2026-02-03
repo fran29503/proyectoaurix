@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+/* MHR Theme Configuration for Tailwind v4 */
+@theme {
+  /* MHR Brand Colors */
+  --color-navy-50: #E8EDF5;
+  --color-navy-100: #C5D1E5;
+  --color-navy-200: #9EB2D1;
+  --color-navy-300: #7793BD;
+  --color-navy-400: #597AAD;
+  --color-navy-500: #3B629E;
+  --color-navy-600: #355896;
+  --color-navy-700: #2D4C8C;
+  --color-navy-800: #264082;
+  --color-navy-900: #192E70;
+  --color-navy-950: #0B1F3A;
+
+  --color-copper-50: #FCF5EE;
+  --color-copper-100: #F7E6D5;
+  --color-copper-200: #EDCAA8;
+  --color-copper-300: #E3AE7B;
+  --color-copper-400: #D9924E;
+  --color-copper-500: #B87333;
+  --color-copper-600: #9A5F2A;
+  --color-copper-700: #7C4B22;
+  --color-copper-800: #5E3819;
+  --color-copper-900: #402511;
+  --color-copper-950: #211208;
+
+  /* Font */
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  /* Border Radius */
+  --radius-lg: 0.5rem;
+  --radius-md: calc(0.5rem - 2px);
+  --radius-sm: calc(0.5rem - 4px);
+}
+
+/* shadcn/ui CSS Variables */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 215 28% 14%;
+  --card: 0 0% 100%;
+  --card-foreground: 215 28% 14%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 215 28% 14%;
+  --primary: 215 68% 14%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 215 28% 14%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+  --accent: 29 56% 46%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 215 68% 14%;
+  --radius: 0.5rem;
+  --chart-1: 215 68% 14%;
+  --chart-2: 29 56% 46%;
+  --chart-3: 173 58% 39%;
+  --chart-4: 43 74% 66%;
+  --chart-5: 27 87% 67%;
+}
+
+.dark {
+  --background: 215 28% 8%;
+  --foreground: 210 40% 98%;
+  --card: 215 28% 10%;
+  --card-foreground: 210 40% 98%;
+  --popover: 215 28% 10%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 29 56% 46%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 215 28% 14%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 215 28% 14%;
+  --muted-foreground: 215 16% 65%;
+  --accent: 29 56% 46%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 62% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 215 28% 18%;
+  --input: 215 28% 18%;
+  --ring: 29 56% 46%;
+  --chart-1: 29 56% 46%;
+  --chart-2: 215 68% 40%;
+  --chart-3: 173 58% 39%;
+  --chart-4: 43 74% 66%;
+  --chart-5: 27 87% 67%;
+}
+
+/* Base styles */
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
