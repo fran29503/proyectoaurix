@@ -2,12 +2,43 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  // Demo mode: Skip auth if Supabase is not configured
+  // Demo mode: Allow access with ?demo=true or demo cookie
+  const isDemoMode =
+    request.nextUrl.searchParams.get("demo") === "true" ||
+    request.cookies.get("demo_mode")?.value === "true";
+
+  // If entering demo mode via URL param, set cookie and redirect
+  if (request.nextUrl.searchParams.get("demo") === "true") {
+    const url = request.nextUrl.clone();
+    url.searchParams.delete("demo");
+    const response = NextResponse.redirect(url);
+    // Set demo cookie for 24 hours
+    response.cookies.set("demo_mode", "true", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24, // 24 hours
+    });
+    return response;
+  }
+
+  // If in demo mode, allow all routes
+  if (isDemoMode) {
+    // But redirect from login to dashboard in demo mode
+    if (request.nextUrl.pathname.startsWith("/login")) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard";
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
+  }
+
+  // Check Supabase configuration
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    // Allow all routes in demo mode (no Supabase configured)
+    // Allow all routes if Supabase is not configured
     return NextResponse.next();
   }
 
