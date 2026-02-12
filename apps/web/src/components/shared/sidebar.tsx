@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -15,64 +16,46 @@ import {
   LogOut,
   UsersRound,
   ChevronRight,
+  type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSignOut } from "@/lib/hooks/use-user";
-import { useState } from "react";
+import { useTenant } from "@/lib/tenant";
+import { useLanguage } from "@/lib/i18n";
+import { useCurrentUser, type Resource } from "@/lib/rbac";
+import { useState, useMemo } from "react";
 
-const navigation = [
-  {
-    name: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    name: "Leads",
-    href: "/dashboard/leads",
-    icon: Users,
-  },
-  {
-    name: "Pipeline",
-    href: "/dashboard/pipeline",
-    icon: KanbanSquare,
-  },
-  {
-    name: "Properties",
-    href: "/dashboard/properties",
-    icon: Building2,
-  },
-  {
-    name: "Tasks",
-    href: "/dashboard/tasks",
-    icon: ClipboardList,
-  },
-  {
-    name: "Team",
-    href: "/dashboard/team",
-    icon: UsersRound,
-  },
-  {
-    name: "Reports",
-    href: "/dashboard/reports",
-    icon: BarChart3,
-  },
+type NavKey = "dashboard" | "leads" | "pipeline" | "properties" | "tasks" | "team" | "reports" | "settings";
+
+interface NavItem {
+  key: NavKey;
+  href: string;
+  icon: LucideIcon;
+}
+
+const navigationConfig: NavItem[] = [
+  { key: "dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { key: "leads", href: "/dashboard/leads", icon: Users },
+  { key: "pipeline", href: "/dashboard/pipeline", icon: KanbanSquare },
+  { key: "properties", href: "/dashboard/properties", icon: Building2 },
+  { key: "tasks", href: "/dashboard/tasks", icon: ClipboardList },
+  { key: "team", href: "/dashboard/team", icon: UsersRound },
+  { key: "reports", href: "/dashboard/reports", icon: BarChart3 },
 ];
 
-const secondaryNavigation = [
-  {
-    name: "Settings",
-    href: "/dashboard/settings",
-    icon: Settings,
-  },
+const secondaryNavigationConfig: NavItem[] = [
+  { key: "settings", href: "/dashboard/settings", icon: Settings },
 ];
 
-function NavItem({
+function NavItemComponent({
   item,
+  name,
   isActive,
   index,
 }: {
-  item: (typeof navigation)[0];
+  item: NavItem;
+  name: string;
   isActive: boolean;
   index: number;
 }) {
@@ -122,7 +105,7 @@ function NavItem({
             "h-5 w-5 transition-transform duration-200",
             isHovered && !isActive && "scale-110"
           )} />
-          {item.name}
+          {name}
         </span>
 
         {/* Arrow indicator */}
@@ -138,6 +121,75 @@ function NavItem({
 export function Sidebar() {
   const pathname = usePathname();
   const { signOut, loading: signingOut } = useSignOut();
+  const { branding, isFeatureEnabled } = useTenant();
+  const { t } = useLanguage();
+  const { user, canAccessNavItem, loading: userLoading } = useCurrentUser();
+
+  // Get translated name for navigation item
+  const getNavName = (key: NavKey): string => {
+    return t.nav[key] || key;
+  };
+
+  // Get translated role name
+  const getRoleName = (role: string): string => {
+    const roleKey = role as keyof typeof t.roles;
+    return t.roles[roleKey] || role;
+  };
+
+  // Filter navigation based on enabled features AND user permissions
+  const filteredNavigation = useMemo(() => {
+    const featureMap: Record<string, string> = {
+      "/dashboard/leads": "leads",
+      "/dashboard/pipeline": "leads",
+      "/dashboard/properties": "properties",
+      "/dashboard/tasks": "tasks",
+      "/dashboard/team": "team",
+      "/dashboard/reports": "reports",
+    };
+
+    // Map NavKey to Resource for permission checking
+    const resourceMap: Record<NavKey, Resource> = {
+      dashboard: "dashboard",
+      leads: "leads",
+      pipeline: "pipeline",
+      properties: "properties",
+      tasks: "tasks",
+      team: "team",
+      reports: "reports",
+      settings: "settings",
+    };
+
+    return navigationConfig.filter((item) => {
+      // Check tenant feature flag
+      const feature = featureMap[item.href];
+      if (feature && !isFeatureEnabled(feature)) return false;
+
+      // Check user permission
+      const resource = resourceMap[item.key];
+      if (!canAccessNavItem(resource)) return false;
+
+      return true;
+    });
+  }, [isFeatureEnabled, canAccessNavItem]);
+
+  // Filter secondary navigation based on permissions
+  const filteredSecondaryNav = useMemo(() => {
+    const resourceMap: Record<NavKey, Resource> = {
+      dashboard: "dashboard",
+      leads: "leads",
+      pipeline: "pipeline",
+      properties: "properties",
+      tasks: "tasks",
+      team: "team",
+      reports: "reports",
+      settings: "settings",
+    };
+
+    return secondaryNavigationConfig.filter((item) => {
+      const resource = resourceMap[item.key];
+      return canAccessNavItem(resource);
+    });
+  }, [canAccessNavItem]);
 
   return (
     <motion.div
@@ -146,7 +198,7 @@ export function Sidebar() {
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className="flex h-full w-64 flex-col bg-slate-900"
     >
-      {/* Logo */}
+      {/* Logo - Dynamic based on tenant branding */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -154,15 +206,33 @@ export function Sidebar() {
         className="flex h-16 items-center gap-3 px-5"
       >
         <div className="relative">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/30">
-            <span className="text-lg font-bold text-white">M</span>
-          </div>
+          {branding.logoWhiteUrl ? (
+            <Image
+              src={branding.logoWhiteUrl}
+              alt={branding.companyName}
+              width={40}
+              height={40}
+              className="h-10 w-10 rounded-xl object-contain"
+            />
+          ) : (
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-xl shadow-lg"
+              style={{
+                background: `linear-gradient(135deg, ${branding.primaryColor}, ${branding.accentColor})`,
+                boxShadow: `0 10px 15px -3px ${branding.primaryColor}40`,
+              }}
+            >
+              <span className="text-lg font-bold text-white">
+                {branding.companyShortName.charAt(0)}
+              </span>
+            </div>
+          )}
           {/* Online indicator */}
           <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-slate-900 bg-emerald-500" />
         </div>
         <div className="flex flex-col">
-          <span className="text-sm font-semibold text-white">Meridian Harbor</span>
-          <span className="text-xs text-slate-500">Real Estate CRM</span>
+          <span className="text-sm font-semibold text-white">{branding.companyName}</span>
+          <span className="text-xs text-slate-500">{t.common.crmSubtitle}</span>
         </div>
       </motion.div>
 
@@ -172,11 +242,11 @@ export function Sidebar() {
       {/* Navigation */}
       <ScrollArea className="flex-1 px-3 py-4">
         <nav className="space-y-1">
-          {navigation.map((item, index) => {
+          {filteredNavigation.map((item, index) => {
             const isActive = pathname === item.href ||
               (item.href !== "/dashboard" && pathname.startsWith(item.href + "/"));
             return (
-              <NavItem key={item.name} item={item} isActive={isActive} index={index} />
+              <NavItemComponent key={item.key} item={item} name={getNavName(item.key)} isActive={isActive} index={index} />
             );
           })}
         </nav>
@@ -186,14 +256,15 @@ export function Sidebar() {
 
         {/* Secondary nav */}
         <nav className="space-y-1">
-          {secondaryNavigation.map((item, index) => {
+          {filteredSecondaryNav.map((item, index) => {
             const isActive = pathname === item.href;
             return (
-              <NavItem
-                key={item.name}
+              <NavItemComponent
+                key={item.key}
                 item={item}
+                name={getNavName(item.key)}
                 isActive={isActive}
-                index={navigation.length + index}
+                index={navigationConfig.length + index}
               />
             );
           })}
@@ -210,14 +281,31 @@ export function Sidebar() {
         {/* User card */}
         <div className="flex items-center gap-3 rounded-xl bg-slate-800/50 p-3">
           <div className="relative">
-            <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-copper-400 to-copper-600 flex items-center justify-center text-white text-sm font-semibold">
-              OA
-            </div>
-            <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-slate-800 bg-emerald-500" />
+            {user?.avatarUrl ? (
+              <Image
+                src={user.avatarUrl}
+                alt={user.fullName}
+                width={36}
+                height={36}
+                className="h-9 w-9 rounded-lg object-cover"
+              />
+            ) : (
+              <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-copper-400 to-copper-600 flex items-center justify-center text-white text-sm font-semibold">
+                {user ? getInitials(user.fullName) : "?"}
+              </div>
+            )}
+            <span className={cn(
+              "absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-slate-800",
+              user?.isActive ? "bg-emerald-500" : "bg-slate-500"
+            )} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">Omar Al-Mansouri</p>
-            <p className="text-xs text-slate-500 truncate">Administrator</p>
+            <p className="text-sm font-medium text-white truncate">
+              {userLoading ? "..." : (user?.fullName || "Guest")}
+            </p>
+            <p className="text-xs text-slate-500 truncate">
+              {user ? getRoleName(user.role) : ""}
+            </p>
           </div>
         </div>
 
@@ -230,7 +318,7 @@ export function Sidebar() {
             disabled={signingOut}
           >
             <LogOut className="h-5 w-5" />
-            {signingOut ? "Signing out..." : "Sign out"}
+            {signingOut ? t.common.loading : t.user.signOut}
           </Button>
         </motion.div>
       </motion.div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -11,10 +12,11 @@ import {
   TrendingUp,
   AlertTriangle,
   ArrowUpRight,
-  ArrowDownRight,
   ChevronRight,
   Clock,
   Sparkles,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
 import { getInitials } from "@/lib/utils";
 import Link from "next/link";
@@ -24,124 +26,31 @@ import { LeadTrendChart } from "@/components/charts/lead-trend-chart";
 import { ConversionFunnel } from "@/components/charts/conversion-funnel";
 import { ChannelPieChart } from "@/components/charts/channel-pie-chart";
 import { AgentPerformanceChart } from "@/components/charts/agent-performance-chart";
+import { useLanguage } from "@/lib/i18n";
+import {
+  getDashboardStats,
+  getRecentLeads,
+  getSLAAlerts,
+  getTopAgents,
+  type DashboardStats,
+  type RecentLead,
+  type SLAAlert,
+  type TopAgent,
+} from "@/lib/queries/dashboard";
 
-// Mock data for MVP demo
-const kpis = [
-  {
-    title: "Total Leads",
-    value: "1,847",
-    change: "+12%",
-    trend: "up" as const,
-    icon: Users,
-    description: "vs last month",
-    gradient: "from-violet-500 to-purple-600",
-    shadowColor: "shadow-violet-500/20",
-  },
-  {
-    title: "Qualified",
-    value: "423",
-    change: "+8%",
-    trend: "up" as const,
-    icon: UserCheck,
-    description: "conversion 22.9%",
-    gradient: "from-emerald-500 to-teal-600",
-    shadowColor: "shadow-emerald-500/20",
-  },
-  {
-    title: "Properties",
-    value: "156",
-    change: "+5",
-    trend: "up" as const,
-    icon: Building2,
-    description: "active listings",
-    gradient: "from-blue-500 to-cyan-600",
-    shadowColor: "shadow-blue-500/20",
-  },
-  {
-    title: "Closings",
-    value: "18",
-    change: "+25%",
-    trend: "up" as const,
-    icon: TrendingUp,
-    description: "this month",
-    gradient: "from-amber-500 to-orange-600",
-    shadowColor: "shadow-amber-500/20",
-  },
-];
+interface KPIData {
+  id: string;
+  title: string;
+  value: string;
+  change: string;
+  trend: "up" | "down";
+  icon: typeof Users;
+  description: string;
+  gradient: string;
+  shadowColor: string;
+}
 
-const slaAlerts = [
-  {
-    id: 1,
-    leadName: "Ahmed Sharif",
-    market: "Dubai",
-    time: "45 min",
-    assignee: "Hassan Ali",
-    severity: "high",
-  },
-  {
-    id: 2,
-    leadName: "Victoria Rodriguez",
-    market: "USA",
-    time: "22 min",
-    assignee: "Mark Rivera",
-    severity: "medium",
-  },
-  {
-    id: 3,
-    leadName: "Daniel Thompson",
-    market: "USA",
-    time: "18 min",
-    assignee: "Sofía Delgado",
-    severity: "medium",
-  },
-];
-
-const recentLeads = [
-  {
-    id: "11111111-0001-0001-0001-000000000001",
-    name: "Ahmed Sharif",
-    channel: "Bayut",
-    interest: "Villa Dubailand",
-    budget: "AED 2.0M - 2.6M",
-    status: "nuevo",
-    time: "8 min ago",
-  },
-  {
-    id: "11111111-0001-0001-0001-000000000002",
-    name: "Elena Kozlova",
-    channel: "Meta Ads",
-    interest: "Downtown 2BR",
-    budget: "AED 3.5M - 4.2M",
-    status: "contactado",
-    time: "45 min ago",
-  },
-  {
-    id: "11111111-0001-0001-0001-000000000003",
-    name: "Daniel Thompson",
-    channel: "Google",
-    interest: "Austin Home",
-    budget: "USD 850k - 1.1M",
-    status: "nuevo",
-    time: "5 min ago",
-  },
-  {
-    id: "11111111-0001-0001-0001-000000000004",
-    name: "Hanna Zimmerman",
-    channel: "Meta Ads",
-    interest: "Studio Investment",
-    budget: "AED 650k - 850k",
-    status: "calificado",
-    time: "1 hour ago",
-  },
-];
-
-const topAgents = [
-  { name: "Lina Petrova", closings: 7, revenue: "AED 28.4M", avatar: "LP" },
-  { name: "Youssef Nasser", closings: 5, revenue: "AED 19.2M", avatar: "YN" },
-  { name: "Aisha Rahman", closings: 4, revenue: "AED 12.8M", avatar: "AR" },
-];
-
-function KPICard({ kpi, index }: { kpi: typeof kpis[0]; index: number }) {
+function KPICard({ kpi, index }: { kpi: KPIData; index: number }) {
   const Icon = kpi.icon;
   const isUp = kpi.trend === "up";
 
@@ -161,8 +70,8 @@ function KPICard({ kpi, index }: { kpi: typeof kpis[0]; index: number }) {
               >
                 <Icon className="h-6 w-6 text-white" />
               </motion.div>
-              <div className={`flex items-center gap-1 text-sm font-medium ${isUp ? "text-emerald-600" : "text-red-500"}`}>
-                {isUp ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
+              <div className={`flex items-center gap-1 text-sm font-medium ${isUp ? "text-emerald-600" : "text-slate-400"}`}>
+                {isUp && <ArrowUpRight className="h-4 w-4" />}
                 {kpi.change}
               </div>
             </div>
@@ -187,6 +96,11 @@ function StatusBadge({ status }: { status: string }) {
     nuevo: "bg-slate-100 text-slate-700 border-slate-200",
     contactado: "bg-blue-50 text-blue-700 border-blue-200",
     calificado: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    propuesta: "bg-violet-50 text-violet-700 border-violet-200",
+    negociacion: "bg-amber-50 text-amber-700 border-amber-200",
+    cerrado: "bg-green-50 text-green-700 border-green-200",
+    ganado: "bg-green-50 text-green-700 border-green-200",
+    perdido: "bg-red-50 text-red-700 border-red-200",
   };
 
   return (
@@ -196,7 +110,114 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+function LoadingState({ text }: { text: string }) {
+  return (
+    <div className="flex items-center justify-center h-96">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex flex-col items-center gap-4"
+      >
+        <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+        <p className="text-slate-500">{text}</p>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
+  const { t } = useLanguage();
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [recentLeads, setRecentLeads] = useState<RecentLead[]>([]);
+  const [slaAlerts, setSLAAlerts] = useState<SLAAlert[]>([]);
+  const [topAgents, setTopAgents] = useState<TopAgent[]>([]);
+
+  const fetchData = async () => {
+    try {
+      const [statsData, leadsData, alertsData, agentsData] = await Promise.all([
+        getDashboardStats(),
+        getRecentLeads(5),
+        getSLAAlerts(),
+        getTopAgents(3),
+      ]);
+
+      setStats(statsData);
+      setRecentLeads(leadsData);
+      setSLAAlerts(alertsData);
+      setTopAgents(agentsData);
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchData();
+  };
+
+  if (loading) {
+    return <LoadingState text={t.common.loading} />;
+  }
+
+  // Build KPI data from real stats
+  const kpis: KPIData[] = [
+    {
+      id: "total-leads",
+      title: t.dashboard.totalLeads,
+      value: stats?.totalLeads?.toLocaleString() || "0",
+      change: stats?.totalLeads ? `${stats.leadsByMarket.dubai + stats.leadsByMarket.usa} total` : "",
+      trend: "up" as const,
+      icon: Users,
+      description: `${t.market.dubai}: ${stats?.leadsByMarket.dubai || 0} · ${t.market.usa}: ${stats?.leadsByMarket.usa || 0}`,
+      gradient: "from-violet-500 to-purple-600",
+      shadowColor: "shadow-violet-500/20",
+    },
+    {
+      id: "qualified-leads",
+      title: t.dashboard.qualifiedLeads,
+      value: stats?.qualifiedLeads?.toLocaleString() || "0",
+      change: stats?.totalLeads
+        ? `${((stats.qualifiedLeads / stats.totalLeads) * 100).toFixed(1)}%`
+        : "0%",
+      trend: "up" as const,
+      icon: UserCheck,
+      description: t.dashboard.conversionRate,
+      gradient: "from-emerald-500 to-teal-600",
+      shadowColor: "shadow-emerald-500/20",
+    },
+    {
+      id: "properties",
+      title: t.dashboard.properties,
+      value: stats?.totalProperties?.toLocaleString() || "0",
+      change: t.properties.available,
+      trend: "up" as const,
+      icon: Building2,
+      description: `${t.market.dubai}: ${stats?.propertiesByMarket.dubai || 0} · ${t.market.usa}: ${stats?.propertiesByMarket.usa || 0}`,
+      gradient: "from-blue-500 to-cyan-600",
+      shadowColor: "shadow-blue-500/20",
+    },
+    {
+      id: "closings",
+      title: t.dashboard.closings,
+      value: stats?.closings?.toLocaleString() || "0",
+      change: "",
+      trend: "up" as const,
+      icon: TrendingUp,
+      description: "",
+      gradient: "from-amber-500 to-orange-600",
+      shadowColor: "shadow-amber-500/20",
+    },
+  ];
+
   return (
     <div className="space-y-8">
       {/* Page Header */}
@@ -208,7 +229,7 @@ export default function DashboardPage() {
               animate={{ opacity: 1, x: 0 }}
               className="text-3xl font-bold text-slate-900"
             >
-              Dashboard
+              {t.dashboard.title}
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, x: -20 }}
@@ -216,18 +237,28 @@ export default function DashboardPage() {
               transition={{ delay: 0.1 }}
               className="text-slate-500 mt-1"
             >
-              Welcome back, Omar. Here&apos;s what&apos;s happening today.
+              {t.dashboard.welcome}
             </motion.p>
           </div>
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="flex items-center gap-2"
+            className="flex items-center gap-3"
           >
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="gap-2 rounded-xl"
+            >
+              <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+              {t.common.refresh}
+            </Button>
             <Badge variant="outline" className="gap-1.5 px-3 py-1.5 border-emerald-200 bg-emerald-50 text-emerald-700">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Live
+              {t.common.live}
             </Badge>
           </motion.div>
         </div>
@@ -236,7 +267,7 @@ export default function DashboardPage() {
       {/* KPI Cards */}
       <StaggerContainer className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {kpis.map((kpi, index) => (
-          <KPICard key={kpi.title} kpi={kpi} index={index} />
+          <KPICard key={kpi.id} kpi={kpi} index={index} />
         ))}
       </StaggerContainer>
 
@@ -262,16 +293,16 @@ export default function DashboardPage() {
                     </motion.div>
                     <div>
                       <p className="font-semibold text-amber-900">
-                        {slaAlerts.length} leads exceeding SLA response time
+                        {slaAlerts.length} {t.dashboard.leadsExceedingSLA}
                       </p>
                       <p className="text-sm text-amber-700">
-                        Immediate action required to maintain service quality
+                        {t.dashboard.immediateActionRequired}
                       </p>
                     </div>
                   </div>
                   <Link href="/dashboard/leads?filter=sla_alert">
                     <Button variant="ghost" size="sm" className="text-amber-700 hover:text-amber-900 hover:bg-amber-100">
-                      View all
+                      {t.common.viewAll}
                       <ChevronRight className="h-4 w-4 ml-1" />
                     </Button>
                   </Link>
@@ -290,10 +321,10 @@ export default function DashboardPage() {
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-lg font-semibold text-slate-900">Lead Trends</CardTitle>
-                    <CardDescription>Monthly lead volume by market</CardDescription>
+                    <CardTitle className="text-lg font-semibold text-slate-900">{t.dashboard.leadTrends}</CardTitle>
+                    <CardDescription>{t.dashboard.leadTrendsDesc}</CardDescription>
                   </div>
-                  <Badge variant="outline" className="text-xs">Last 12 months</Badge>
+                  <Badge variant="outline" className="text-xs">{t.dashboard.last12Months}</Badge>
                 </div>
               </CardHeader>
               <CardContent>
@@ -301,11 +332,11 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-center gap-8 mt-6 pt-4 border-t border-slate-100">
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-3 rounded-full bg-slate-900" />
-                    <span className="text-sm text-slate-600">Dubai</span>
+                    <span className="text-sm text-slate-600">{t.market.dubai}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-3 rounded-full bg-violet-500" />
-                    <span className="text-sm text-slate-600">USA</span>
+                    <span className="text-sm text-slate-600">{t.market.usa}</span>
                   </div>
                 </div>
               </CardContent>
@@ -319,12 +350,12 @@ export default function DashboardPage() {
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-lg font-semibold text-slate-900">Conversion Funnel</CardTitle>
-                    <CardDescription>Lead progression through pipeline</CardDescription>
+                    <CardTitle className="text-lg font-semibold text-slate-900">{t.dashboard.conversionFunnel}</CardTitle>
+                    <CardDescription>{t.dashboard.conversionFunnelDesc}</CardDescription>
                   </div>
                   <div className="flex items-center gap-1 text-violet-600">
                     <Sparkles className="h-4 w-4" />
-                    <span className="text-xs font-medium">AI Insights</span>
+                    <span className="text-xs font-medium">{t.dashboard.aiInsights}</span>
                   </div>
                 </div>
               </CardHeader>
@@ -343,12 +374,12 @@ export default function DashboardPage() {
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div>
-                  <CardTitle className="text-lg font-semibold text-slate-900">Agent Performance</CardTitle>
-                  <CardDescription>Leads assigned vs closings</CardDescription>
+                  <CardTitle className="text-lg font-semibold text-slate-900">{t.dashboard.agentPerformance}</CardTitle>
+                  <CardDescription>{t.dashboard.agentPerformanceDesc}</CardDescription>
                 </div>
                 <Link href="/dashboard/team">
                   <Button variant="ghost" size="sm" className="text-violet-600 hover:text-violet-700 hover:bg-violet-50">
-                    View team
+                    {t.dashboard.viewTeam}
                     <ChevronRight className="h-4 w-4 ml-1" />
                   </Button>
                 </Link>
@@ -358,11 +389,11 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-center gap-8 mt-6 pt-4 border-t border-slate-100">
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-3 rounded bg-slate-900" />
-                    <span className="text-sm text-slate-600">Leads</span>
+                    <span className="text-sm text-slate-600">{t.dashboard.leadsLabel}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-3 rounded bg-violet-500" />
-                    <span className="text-sm text-slate-600">Closings</span>
+                    <span className="text-sm text-slate-600">{t.dashboard.closingsLabel}</span>
                   </div>
                 </div>
               </CardContent>
@@ -374,44 +405,50 @@ export default function DashboardPage() {
           <HoverLift liftAmount={-2}>
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-semibold text-slate-900">Top Performers</CardTitle>
-                <CardDescription>This month&apos;s leaders</CardDescription>
+                <CardTitle className="text-lg font-semibold text-slate-900">{t.dashboard.topAgents}</CardTitle>
+                <CardDescription>{t.team.agents}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {topAgents.map((agent, index) => (
-                  <motion.div
-                    key={agent.name}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.8 + index * 0.1 }}
-                    whileHover={{ x: 5 }}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer"
-                  >
-                    <div className="relative">
-                      <Avatar className="h-10 w-10 ring-2 ring-white shadow-md">
-                        <AvatarFallback className={`text-white text-xs font-semibold ${
-                          index === 0 ? "bg-gradient-to-br from-amber-400 to-amber-600" :
-                          index === 1 ? "bg-gradient-to-br from-slate-400 to-slate-600" :
-                          "bg-gradient-to-br from-amber-600 to-amber-800"
+                {topAgents.length > 0 ? (
+                  topAgents.map((agent, index) => (
+                    <motion.div
+                      key={agent.id}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.8 + index * 0.1 }}
+                      whileHover={{ x: 5 }}
+                      className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer"
+                    >
+                      <div className="relative">
+                        <Avatar className="h-10 w-10 ring-2 ring-white shadow-md">
+                          <AvatarFallback className={`text-white text-xs font-semibold ${
+                            index === 0 ? "bg-gradient-to-br from-amber-400 to-amber-600" :
+                            index === 1 ? "bg-gradient-to-br from-slate-400 to-slate-600" :
+                            "bg-gradient-to-br from-amber-600 to-amber-800"
+                          }`}>
+                            {agent.avatar}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className={`absolute -top-1 -right-1 h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm ${
+                          index === 0 ? "bg-amber-500" : index === 1 ? "bg-slate-500" : "bg-amber-700"
                         }`}>
-                          {agent.avatar}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className={`absolute -top-1 -right-1 h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm ${
-                        index === 0 ? "bg-amber-500" : index === 1 ? "bg-slate-500" : "bg-amber-700"
-                      }`}>
-                        {index + 1}
+                          {index + 1}
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-sm text-slate-900">{agent.name}</p>
-                      <p className="text-xs text-slate-500">
-                        {agent.closings} closings · {agent.revenue}
-                      </p>
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-slate-400" />
-                  </motion.div>
-                ))}
+                      <div className="flex-1">
+                        <p className="font-medium text-sm text-slate-900">{agent.name}</p>
+                        <p className="text-xs text-slate-500">
+                          {agent.closings} {t.dashboard.closingsLabel.toLowerCase()} · {agent.totalLeads} {t.nav.leads.toLowerCase()}
+                        </p>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-slate-400" />
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-slate-500">
+                    <p className="text-sm">{t.dashboard.noAgentData}</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </HoverLift>
@@ -425,66 +462,72 @@ export default function DashboardPage() {
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div>
-                  <CardTitle className="text-lg font-semibold text-slate-900">Recent Leads</CardTitle>
-                  <CardDescription>Latest leads requiring attention</CardDescription>
+                  <CardTitle className="text-lg font-semibold text-slate-900">{t.dashboard.recentLeads}</CardTitle>
+                  <CardDescription>{t.leads.title}</CardDescription>
                 </div>
                 <Link href="/dashboard/leads">
                   <Button variant="ghost" size="sm" className="text-violet-600 hover:text-violet-700 hover:bg-violet-50">
-                    View all
+                    {t.common.viewAll}
                     <ChevronRight className="h-4 w-4 ml-1" />
                   </Button>
                 </Link>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-slate-100 text-left text-sm text-slate-500">
-                        <th className="pb-3 font-medium">Lead</th>
-                        <th className="pb-3 font-medium">Channel</th>
-                        <th className="pb-3 font-medium">Budget</th>
-                        <th className="pb-3 font-medium">Status</th>
-                        <th className="pb-3 font-medium">Time</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                      {recentLeads.map((lead, index) => (
-                        <motion.tr
-                          key={lead.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.9 + index * 0.05 }}
-                          className="text-sm group hover:bg-slate-50 transition-colors"
-                        >
-                          <td className="py-3">
-                            <Link href={`/dashboard/leads/${lead.id}`} className="flex items-center gap-3">
-                              <Avatar className="h-9 w-9 ring-2 ring-white shadow-sm">
-                                <AvatarFallback className="bg-gradient-to-br from-slate-700 to-slate-900 text-white text-xs font-semibold">
-                                  {getInitials(lead.name)}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <span className="font-medium text-slate-900 group-hover:text-violet-600 transition-colors">
-                                  {lead.name}
-                                </span>
-                                <p className="text-xs text-slate-500">{lead.interest}</p>
-                              </div>
-                            </Link>
-                          </td>
-                          <td className="py-3 text-slate-600">{lead.channel}</td>
-                          <td className="py-3 font-medium text-slate-900">{lead.budget}</td>
-                          <td className="py-3">
-                            <StatusBadge status={lead.status} />
-                          </td>
-                          <td className="py-3 text-slate-500 flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {lead.time}
-                          </td>
-                        </motion.tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                {recentLeads.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-slate-100 text-left text-sm text-slate-500">
+                          <th className="pb-3 font-medium">{t.leads.title}</th>
+                          <th className="pb-3 font-medium">{t.leads.channel}</th>
+                          <th className="pb-3 font-medium">{t.leads.budget}</th>
+                          <th className="pb-3 font-medium">{t.leads.status}</th>
+                          <th className="pb-3 font-medium">{t.time.today}</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                        {recentLeads.map((lead, index) => (
+                          <motion.tr
+                            key={lead.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.9 + index * 0.05 }}
+                            className="text-sm group hover:bg-slate-50 transition-colors"
+                          >
+                            <td className="py-3">
+                              <Link href={`/dashboard/leads/${lead.id}`} className="flex items-center gap-3">
+                                <Avatar className="h-9 w-9 ring-2 ring-white shadow-sm">
+                                  <AvatarFallback className="bg-gradient-to-br from-slate-700 to-slate-900 text-white text-xs font-semibold">
+                                    {getInitials(lead.name)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <span className="font-medium text-slate-900 group-hover:text-violet-600 transition-colors">
+                                    {lead.name}
+                                  </span>
+                                  <p className="text-xs text-slate-500">{lead.interest}</p>
+                                </div>
+                              </Link>
+                            </td>
+                            <td className="py-3 text-slate-600">{lead.channel}</td>
+                            <td className="py-3 font-medium text-slate-900">{lead.budget}</td>
+                            <td className="py-3">
+                              <StatusBadge status={lead.status} />
+                            </td>
+                            <td className="py-3 text-slate-500 flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {lead.time}
+                            </td>
+                          </motion.tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-slate-500">
+                    <p className="text-sm">{t.dashboard.noRecentLeads}</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </HoverLift>
@@ -494,8 +537,8 @@ export default function DashboardPage() {
           <HoverLift liftAmount={-2}>
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-semibold text-slate-900">Leads by Channel</CardTitle>
-                <CardDescription>Source attribution this month</CardDescription>
+                <CardTitle className="text-lg font-semibold text-slate-900">{t.dashboard.leadsByChannel}</CardTitle>
+                <CardDescription>{t.leads.channel}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ChannelPieChart />
@@ -515,9 +558,9 @@ export default function DashboardPage() {
                   <Clock className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <CardTitle className="text-base text-amber-900">SLA Alert Details</CardTitle>
+                  <CardTitle className="text-base text-amber-900">{t.dashboard.slaAlerts}</CardTitle>
                   <CardDescription className="text-amber-700">
-                    Leads without response exceeding 10 minute SLA
+                    SLA
                   </CardDescription>
                 </div>
               </div>
@@ -545,7 +588,7 @@ export default function DashboardPage() {
                     <div>
                       <p className="font-medium text-slate-900">{alert.leadName}</p>
                       <p className="text-sm text-slate-500">
-                        {alert.market} · Assigned to {alert.assignee}
+                        {alert.market} · {t.dashboard.assignedTo} {alert.assignee}
                       </p>
                     </div>
                   </div>
@@ -557,13 +600,15 @@ export default function DashboardPage() {
                           : "bg-amber-100 text-amber-700 border-amber-200"
                       }
                     >
-                      {alert.time} waiting
+                      {alert.time} {t.dashboard.waiting}
                     </Badge>
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Button size="sm" className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-lg shadow-violet-500/25">
-                        Contact Now
-                      </Button>
-                    </motion.div>
+                    <Link href={`/dashboard/leads/${alert.id}`}>
+                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                        <Button size="sm" className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-lg shadow-violet-500/25">
+                          {t.dashboard.contactNow}
+                        </Button>
+                      </motion.div>
+                    </Link>
                   </div>
                 </motion.div>
               ))}

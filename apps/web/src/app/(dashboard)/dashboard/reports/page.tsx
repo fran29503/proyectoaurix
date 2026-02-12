@@ -28,6 +28,7 @@ import { LeadTrendChart } from "@/components/charts/lead-trend-chart";
 import { ConversionFunnel } from "@/components/charts/conversion-funnel";
 import { ChannelPieChart } from "@/components/charts/channel-pie-chart";
 import { AgentPerformanceChart } from "@/components/charts/agent-performance-chart";
+import { useLanguage } from "@/lib/i18n";
 
 // Mock data for reports
 const summaryMetrics = {
@@ -112,6 +113,7 @@ function MetricCard({
 }
 
 export default function ReportsPage() {
+  const { t } = useLanguage();
   const [period, setPeriod] = useState("year");
   const [market, setMarket] = useState("all");
 
@@ -120,35 +122,35 @@ export default function ReportsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-navy-950">Reports</h1>
+          <h1 className="text-2xl font-bold text-navy-950">{t.reports.title}</h1>
           <p className="text-muted-foreground">
-            Performance analytics and insights
+            {t.reports.agentPerformance}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <Select value={market} onValueChange={setMarket}>
             <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Market" />
+              <SelectValue placeholder={t.form.market} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Markets</SelectItem>
-              <SelectItem value="dubai">Dubai</SelectItem>
-              <SelectItem value="usa">USA</SelectItem>
+              <SelectItem value="all">{t.market.all}</SelectItem>
+              <SelectItem value="dubai">{t.market.dubai}</SelectItem>
+              <SelectItem value="usa">{t.market.usa}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={period} onValueChange={setPeriod}>
             <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Period" />
+              <SelectValue placeholder={t.reports.dateRange} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="month">This Month</SelectItem>
-              <SelectItem value="quarter">This Quarter</SelectItem>
-              <SelectItem value="year">This Year</SelectItem>
+              <SelectItem value="month">{t.time.thisMonth}</SelectItem>
+              <SelectItem value="quarter">{t.time.thisWeek}</SelectItem>
+              <SelectItem value="year">{t.dashboard.last12Months}</SelectItem>
             </SelectContent>
           </Select>
           <Button variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
-            Export
+            {t.common.export}
           </Button>
         </div>
       </div>
@@ -188,10 +190,10 @@ export default function ReportsPage() {
       {/* Tabs for different report views */}
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="agents">Agents</TabsTrigger>
-          <TabsTrigger value="channels">Channels</TabsTrigger>
-          <TabsTrigger value="properties">Properties</TabsTrigger>
+          <TabsTrigger value="overview">{t.nav.dashboard}</TabsTrigger>
+          <TabsTrigger value="agents">{t.team.agents}</TabsTrigger>
+          <TabsTrigger value="channels">{t.leads.channel}</TabsTrigger>
+          <TabsTrigger value="properties">{t.nav.properties}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -199,19 +201,19 @@ export default function ReportsPage() {
           <div className="grid gap-6 lg:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Lead Volume Trends</CardTitle>
-                <CardDescription>Monthly comparison by market</CardDescription>
+                <CardTitle className="text-base">{t.dashboard.leadTrends}</CardTitle>
+                <CardDescription>{t.dashboard.leadTrendsDesc}</CardDescription>
               </CardHeader>
               <CardContent>
                 <LeadTrendChart />
                 <div className="flex items-center justify-center gap-6 mt-4 pt-4 border-t">
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-3 rounded-full bg-navy-950" />
-                    <span className="text-sm text-muted-foreground">Dubai</span>
+                    <span className="text-sm text-muted-foreground">{t.market.dubai}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-3 rounded-full bg-copper-500" />
-                    <span className="text-sm text-muted-foreground">USA</span>
+                    <span className="text-sm text-muted-foreground">{t.market.usa}</span>
                   </div>
                 </div>
               </CardContent>
@@ -219,8 +221,8 @@ export default function ReportsPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Conversion Funnel</CardTitle>
-                <CardDescription>Lead progression analysis</CardDescription>
+                <CardTitle className="text-base">{t.dashboard.conversionFunnel}</CardTitle>
+                <CardDescription>{t.dashboard.conversionFunnelDesc}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ConversionFunnel />
@@ -286,19 +288,19 @@ export default function ReportsPage() {
           <div className="grid gap-6 lg:grid-cols-3">
             <Card className="lg:col-span-2">
               <CardHeader>
-                <CardTitle className="text-base">Agent Performance</CardTitle>
-                <CardDescription>Leads vs closings comparison</CardDescription>
+                <CardTitle className="text-base">{t.dashboard.agentPerformance}</CardTitle>
+                <CardDescription>{t.dashboard.agentPerformanceDesc}</CardDescription>
               </CardHeader>
               <CardContent>
                 <AgentPerformanceChart />
                 <div className="flex items-center justify-center gap-6 mt-4 pt-4 border-t">
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-3 rounded bg-navy-950" />
-                    <span className="text-sm text-muted-foreground">Leads</span>
+                    <span className="text-sm text-muted-foreground">{t.nav.leads}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-3 rounded bg-copper-500" />
-                    <span className="text-sm text-muted-foreground">Closings</span>
+                    <span className="text-sm text-muted-foreground">{t.dashboard.closings}</span>
                   </div>
                 </div>
               </CardContent>
@@ -306,8 +308,8 @@ export default function ReportsPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Source Distribution</CardTitle>
-                <CardDescription>Leads by channel</CardDescription>
+                <CardTitle className="text-base">{t.dashboard.leadsByChannel}</CardTitle>
+                <CardDescription>{t.leads.channel}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ChannelPieChart />

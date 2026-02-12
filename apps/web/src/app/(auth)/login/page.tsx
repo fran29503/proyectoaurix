@@ -20,19 +20,29 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
 
-    if (error) {
-      setError(error.message);
+      if (error) {
+        console.error("Login error:", error);
+        setError(error.message);
+        setLoading(false);
+        return;
+      }
+
+      if (data?.user) {
+        console.log("Login successful:", data.user.email);
+        window.location.href = "/dashboard";
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      setError("An unexpected error occurred");
       setLoading(false);
-      return;
     }
-
-    window.location.href = "/dashboard";
   };
 
   const enterDemoMode = () => {

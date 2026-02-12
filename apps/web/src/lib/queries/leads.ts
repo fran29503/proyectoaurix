@@ -7,10 +7,10 @@ export interface Lead {
   email: string | null;
   phone: string | null;
   whatsapp: string | null;
-  nationality: string | null;
+  country_residence: string | null;
   language: string | null;
-  source_channel: string | null;
-  source_campaign: string | null;
+  channel: string | null;
+  campaign: string | null;
   status: string;
   intent: string | null;
   interest_zone: string | null;
@@ -18,7 +18,7 @@ export interface Lead {
   budget_min: number | null;
   budget_max: number | null;
   budget_currency: string;
-  timeline: string | null;
+  timing: string | null;
   ai_score: number | null;
   ai_summary: string | null;
   assigned_to: string | null;

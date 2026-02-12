@@ -17,27 +17,21 @@ import { useSignOut } from "@/lib/hooks/use-user";
 import { getInitials } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { LanguageSelector } from "./language-selector";
+import { useLanguage } from "@/lib/i18n";
+import { useCurrentUser } from "@/lib/rbac";
 
-interface HeaderProps {
-  user?: {
-    fullName: string;
-    email: string;
-    role: string;
-    avatarUrl?: string | null;
-  };
-}
-
-export function Header({ user }: HeaderProps) {
+export function Header() {
   const { signOut } = useSignOut();
+  const { t } = useLanguage();
+  const { user, loading: userLoading } = useCurrentUser();
   const [searchFocused, setSearchFocused] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  // Demo user for MVP
-  const currentUser = user || {
-    fullName: "Omar Al-Mansouri",
-    email: "omar@meridianharbor.ae",
-    role: "admin",
-    avatarUrl: null,
+  // Get translated role name
+  const getRoleName = (role: string): string => {
+    const roleKey = role as keyof typeof t.roles;
+    return t.roles[roleKey] || role;
   };
 
   const notifications = [
@@ -65,7 +59,7 @@ export function Header({ user }: HeaderProps) {
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
             type="search"
-            placeholder="Search leads, properties, tasks..."
+            placeholder={t.common.search}
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setSearchFocused(false)}
             className="h-10 pl-10 pr-20 bg-slate-50 border-slate-200 rounded-xl focus:bg-white focus:border-violet-300 focus:ring-2 focus:ring-violet-500/10 transition-all duration-200"
@@ -89,7 +83,7 @@ export function Header({ user }: HeaderProps) {
             className="h-9 px-3 gap-2 text-violet-600 hover:text-violet-700 hover:bg-violet-50 rounded-xl"
           >
             <Sparkles className="h-4 w-4" />
-            <span className="hidden sm:inline">AI Assistant</span>
+            <span className="hidden sm:inline">{t.dashboard.aiInsights}</span>
           </Button>
         </motion.div>
 
@@ -121,12 +115,12 @@ export function Header({ user }: HeaderProps) {
               </Button>
             </motion.div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80 p-0 rounded-xl shadow-xl border-slate-200">
+          <DropdownMenuContent align="end" className="w-80 p-0 rounded-xl shadow-xl border-slate-200 bg-white z-50">
             <div className="p-4 border-b border-slate-100">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-slate-900">Notifications</h3>
+                <h3 className="font-semibold text-slate-900">{t.user.notifications}</h3>
                 <Button variant="ghost" size="sm" className="text-violet-600 hover:text-violet-700 h-8 px-2 text-xs">
-                  Mark all read
+                  {t.common.viewAll}
                 </Button>
               </div>
             </div>
@@ -156,7 +150,7 @@ export function Header({ user }: HeaderProps) {
             </div>
             <div className="p-3 border-t border-slate-100">
               <Button variant="ghost" className="w-full text-sm text-violet-600 hover:text-violet-700 hover:bg-violet-50 rounded-lg">
-                View all notifications
+                {t.common.viewAll}
               </Button>
             </div>
           </DropdownMenuContent>
@@ -172,52 +166,56 @@ export function Header({ user }: HeaderProps) {
               <Button variant="ghost" className="flex items-center gap-3 px-2 h-10 rounded-xl hover:bg-slate-100">
                 <div className="relative">
                   <Avatar className="h-8 w-8 ring-2 ring-white shadow-sm">
-                    <AvatarImage src={currentUser.avatarUrl || undefined} />
+                    <AvatarImage src={user?.avatarUrl || undefined} />
                     <AvatarFallback className="bg-gradient-to-br from-violet-500 to-purple-600 text-white text-xs font-semibold">
-                      {getInitials(currentUser.fullName)}
+                      {user ? getInitials(user.fullName) : "?"}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500" />
+                  <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${user?.isActive ? "bg-emerald-500" : "bg-slate-400"}`} />
                 </div>
                 <div className="hidden flex-col items-start lg:flex">
-                  <span className="text-sm font-medium text-slate-900">{currentUser.fullName}</span>
-                  <span className="text-xs text-slate-500 capitalize">
-                    {currentUser.role}
+                  <span className="text-sm font-medium text-slate-900">
+                    {userLoading ? "..." : (user?.fullName || "Guest")}
+                  </span>
+                  <span className="text-xs text-slate-500">
+                    {user ? getRoleName(user.role) : ""}
                   </span>
                 </div>
               </Button>
             </motion.div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-xl border-slate-200">
+          <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-xl border-slate-200 bg-white z-50">
             <DropdownMenuLabel className="p-4">
               <div className="flex items-center gap-3">
                 <Avatar className="h-10 w-10">
+                  <AvatarImage src={user?.avatarUrl || undefined} />
                   <AvatarFallback className="bg-gradient-to-br from-violet-500 to-purple-600 text-white text-sm font-semibold">
-                    {getInitials(currentUser.fullName)}
+                    {user ? getInitials(user.fullName) : "?"}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-slate-900 truncate">{currentUser.fullName}</p>
-                  <p className="text-xs text-slate-500 truncate">{currentUser.email}</p>
+                  <p className="font-medium text-slate-900 truncate">{user?.fullName || "Guest"}</p>
+                  <p className="text-xs text-slate-500 truncate">{user?.email || ""}</p>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="cursor-pointer rounded-lg mx-2 my-1">
-              Profile Settings
+              {t.user.profile}
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer rounded-lg mx-2 my-1">
-              Preferences
+              {t.user.preferences}
             </DropdownMenuItem>
+            <LanguageSelector />
             <DropdownMenuItem className="cursor-pointer rounded-lg mx-2 my-1">
-              Help & Support
+              {t.user.help}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={signOut}
               className="cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg mx-2 my-1"
             >
-              Sign out
+              {t.user.signOut}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

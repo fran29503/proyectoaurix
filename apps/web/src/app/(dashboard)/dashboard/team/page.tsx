@@ -39,6 +39,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn, getInitials } from "@/lib/utils";
 import { getTeamMembers, roleLabels, teamLabels, type TeamMember } from "@/lib/queries/team";
+import { useLanguage } from "@/lib/i18n";
+import { Can, ManagerOrAbove } from "@/lib/rbac";
 
 const roleColors: Record<string, string> = {
   admin: "bg-purple-100 text-purple-700",
@@ -49,7 +51,9 @@ const roleColors: Record<string, string> = {
 };
 
 function TeamMemberRow({ member }: { member: TeamMember }) {
+  const { t } = useLanguage();
   const isAgent = ["agent", "team_lead"].includes(member.role);
+  const roleKey = member.role as keyof typeof t.roles;
 
   return (
     <TableRow>
@@ -68,7 +72,7 @@ function TeamMemberRow({ member }: { member: TeamMember }) {
       </TableCell>
       <TableCell>
         <Badge variant="secondary" className={cn("font-normal", roleColors[member.role])}>
-          {roleLabels[member.role] || member.role}
+          {t.roles[roleKey] || roleLabels[member.role] || member.role}
         </Badge>
       </TableCell>
       <TableCell>
@@ -83,7 +87,7 @@ function TeamMemberRow({ member }: { member: TeamMember }) {
       </TableCell>
       <TableCell>
         <Badge variant={member.is_active ? "default" : "secondary"} className={member.is_active ? "bg-emerald-100 text-emerald-700" : ""}>
-          {member.is_active ? "Active" : "Inactive"}
+          {member.is_active ? t.team.active : t.team.inactive}
         </Badge>
       </TableCell>
       <TableCell>
@@ -96,12 +100,12 @@ function TeamMemberRow({ member }: { member: TeamMember }) {
           <DropdownMenuContent align="end">
             <DropdownMenuItem>
               <Mail className="mr-2 h-4 w-4" />
-              Email
+              {t.common.email}
             </DropdownMenuItem>
             {member.phone && (
               <DropdownMenuItem>
                 <Phone className="mr-2 h-4 w-4" />
-                Call
+                {t.common.call}
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>
@@ -112,6 +116,7 @@ function TeamMemberRow({ member }: { member: TeamMember }) {
 }
 
 export default function TeamPage() {
+  const { t } = useLanguage();
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -124,7 +129,7 @@ export default function TeamPage() {
         const data = await getTeamMembers();
         setMembers(data);
       } catch (err) {
-        setError("Failed to load team members");
+        setError("loadTeamError");
         console.error(err);
       } finally {
         setLoading(false);
@@ -156,10 +161,11 @@ export default function TeamPage() {
   }
 
   if (error) {
+    const errorKey = error as keyof typeof t.messages;
     return (
       <div className="flex flex-col items-center justify-center h-96 space-y-4">
-        <p className="text-red-600">{error}</p>
-        <Button onClick={() => window.location.reload()}>Retry</Button>
+        <p className="text-red-600">{t.messages[errorKey] || error}</p>
+        <Button onClick={() => window.location.reload()}>{t.properties.retry}</Button>
       </div>
     );
   }
@@ -169,14 +175,16 @@ export default function TeamPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-navy-950">Team</h1>
+          <h1 className="text-2xl font-bold text-navy-950">{t.team.title}</h1>
           <p className="text-muted-foreground">
-            Manage your team members
+            {t.team.members}
           </p>
         </div>
-        <Button size="sm" className="bg-copper-500 hover:bg-copper-600">
-          Invite Member
-        </Button>
+        <Can resource="team" action="create">
+          <Button size="sm" className="bg-copper-500 hover:bg-copper-600">
+            {t.common.add}
+          </Button>
+        </Can>
       </div>
 
       {/* Stats */}
@@ -189,7 +197,7 @@ export default function TeamPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{members.length}</p>
-                <p className="text-sm text-muted-foreground">Team Members</p>
+                <p className="text-sm text-muted-foreground">{t.team.members}</p>
               </div>
             </div>
           </CardContent>
@@ -202,7 +210,7 @@ export default function TeamPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{activeCount}</p>
-                <p className="text-sm text-muted-foreground">Active</p>
+                <p className="text-sm text-muted-foreground">{t.team.active}</p>
               </div>
             </div>
           </CardContent>
@@ -215,7 +223,7 @@ export default function TeamPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{agents.length}</p>
-                <p className="text-sm text-muted-foreground">Agents</p>
+                <p className="text-sm text-muted-foreground">{t.team.agents}</p>
               </div>
             </div>
           </CardContent>
@@ -228,7 +236,7 @@ export default function TeamPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{dubaiCount}/{usaCount}</p>
-                <p className="text-sm text-muted-foreground">Dubai / USA</p>
+                <p className="text-sm text-muted-foreground">{t.market.dubai} / {t.market.usa}</p>
               </div>
             </div>
           </CardContent>
@@ -239,29 +247,29 @@ export default function TeamPage() {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm font-medium">Filters:</span>
+          <span className="text-sm font-medium">{t.common.filters}:</span>
         </div>
         <Select value={marketFilter} onValueChange={setMarketFilter}>
           <SelectTrigger className="w-[130px]">
-            <SelectValue placeholder="Market" />
+            <SelectValue placeholder={t.form.market} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Markets</SelectItem>
-            <SelectItem value="dubai">Dubai</SelectItem>
-            <SelectItem value="usa">USA</SelectItem>
+            <SelectItem value="all">{t.market.all}</SelectItem>
+            <SelectItem value="dubai">{t.market.dubai}</SelectItem>
+            <SelectItem value="usa">{t.market.usa}</SelectItem>
           </SelectContent>
         </Select>
         <Select value={roleFilter} onValueChange={setRoleFilter}>
           <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Role" />
+            <SelectValue placeholder={t.team.role} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Roles</SelectItem>
-            <SelectItem value="admin">Admin</SelectItem>
-            <SelectItem value="manager">Manager</SelectItem>
-            <SelectItem value="team_lead">Team Lead</SelectItem>
-            <SelectItem value="agent">Agent</SelectItem>
-            <SelectItem value="backoffice">Back Office</SelectItem>
+            <SelectItem value="all">{t.roles.all}</SelectItem>
+            <SelectItem value="admin">{t.roles.admin}</SelectItem>
+            <SelectItem value="manager">{t.roles.manager}</SelectItem>
+            <SelectItem value="team_lead">{t.roles.team_lead}</SelectItem>
+            <SelectItem value="agent">{t.roles.agent}</SelectItem>
+            <SelectItem value="backoffice">{t.roles.backoffice}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -272,11 +280,11 @@ export default function TeamPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Member</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Team</TableHead>
-                <TableHead>Market</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t.table.member}</TableHead>
+                <TableHead>{t.table.role}</TableHead>
+                <TableHead>{t.table.team}</TableHead>
+                <TableHead>{t.table.market}</TableHead>
+                <TableHead>{t.table.status}</TableHead>
                 <TableHead></TableHead>
               </TableRow>
             </TableHeader>
@@ -288,7 +296,7 @@ export default function TeamPage() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                    No team members found
+                    {t.form.noTeamMembers}
                   </TableCell>
                 </TableRow>
               )}

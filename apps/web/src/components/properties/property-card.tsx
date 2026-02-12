@@ -20,12 +20,17 @@ import {
   Eye,
   FileText,
   Share2,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PropertyData, formatPropertyPrice } from "@/lib/data/properties";
+import { useLanguage } from "@/lib/i18n";
 
 interface PropertyCardProps {
   property: PropertyData;
+  onEdit?: (propertyId: string) => void;
+  onDelete?: (propertyId: string) => void;
 }
 
 const statusColors: Record<string, { bg: string; text: string }> = {
@@ -34,14 +39,21 @@ const statusColors: Record<string, { bg: string; text: string }> = {
   vendido: { bg: "bg-slate-100", text: "text-slate-600" },
 };
 
-const operationLabels: Record<string, string> = {
-  "off-plan": "Off-Plan",
-  resale: "Resale",
-  rent: "Rent",
-};
-
-export function PropertyCard({ property }: PropertyCardProps) {
+export function PropertyCard({ property, onEdit, onDelete }: PropertyCardProps) {
+  const { t } = useLanguage();
   const statusStyle = statusColors[property.status];
+
+  const statusLabels: Record<string, string> = {
+    disponible: t.properties.available,
+    reservado: t.properties.reserved,
+    vendido: t.properties.sold,
+  };
+
+  const operationLabels: Record<string, string> = {
+    "off-plan": t.properties.offPlan,
+    resale: t.properties.resale,
+    rent: t.properties.rent,
+  };
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow group">
@@ -53,10 +65,10 @@ export function PropertyCard({ property }: PropertyCardProps) {
         {/* Badges */}
         <div className="absolute top-3 left-3 flex gap-2">
           <Badge className={cn("font-normal", statusStyle.bg, statusStyle.text)}>
-            {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
+            {statusLabels[property.status] || property.status}
           </Badge>
           <Badge variant="secondary" className="bg-white/90">
-            {operationLabels[property.operation]}
+            {operationLabels[property.operation] || property.operation}
           </Badge>
         </div>
         {/* Market flag */}
@@ -68,12 +80,12 @@ export function PropertyCard({ property }: PropertyCardProps) {
           <Link href={`/dashboard/properties/${property.id}`}>
             <Button size="sm" variant="secondary">
               <Eye className="mr-2 h-4 w-4" />
-              View
+              {t.common.view}
             </Button>
           </Link>
           <Button size="sm" variant="secondary">
             <FileText className="mr-2 h-4 w-4" />
-            PDF
+            {t.common.pdf}
           </Button>
         </div>
       </div>
@@ -92,25 +104,40 @@ export function PropertyCard({ property }: PropertyCardProps) {
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2">
+              <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 rounded-lg hover:bg-slate-100">
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
+            <DropdownMenuContent align="end" className="bg-white rounded-xl shadow-lg border-slate-200">
+              <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
                 <Link href={`/dashboard/properties/${property.id}`}>
                   <Eye className="mr-2 h-4 w-4" />
-                  View Details
+                  {t.common.viewDetails}
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              {onEdit && (
+                <DropdownMenuItem onClick={() => onEdit(property.id)} className="rounded-lg cursor-pointer">
+                  <Pencil className="mr-2 h-4 w-4" />
+                  {t.properties.editProperty}
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem className="rounded-lg cursor-pointer">
                 <FileText className="mr-2 h-4 w-4" />
-                Generate PDF
+                {t.common.generatePdf}
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem className="rounded-lg cursor-pointer">
                 <Share2 className="mr-2 h-4 w-4" />
-                Share
+                {t.common.share}
               </DropdownMenuItem>
+              {onDelete && (
+                <DropdownMenuItem
+                  onClick={() => onDelete(property.id)}
+                  className="rounded-lg cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  {t.common.delete}
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

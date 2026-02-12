@@ -43,6 +43,9 @@ import {
   Phone,
   Mail,
   Eye,
+  Pencil,
+  Trash2,
+  UserPlus,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -53,9 +56,13 @@ import {
 import { cn, getInitials, formatRelativeTime } from "@/lib/utils";
 import { LeadData, formatBudgetRange } from "@/lib/data/leads";
 import { PIPELINE_STAGES, INTENT_LEVELS } from "@/types";
+import { useLanguage } from "@/lib/i18n";
 
 interface LeadsTableProps {
   data: LeadData[];
+  onEdit?: (leadId: string) => void;
+  onDelete?: (leadId: string) => void;
+  onAssign?: (leadId: string) => void;
 }
 
 const statusColors: Record<string, string> = {
@@ -85,7 +92,8 @@ const channelLabels: Record<string, string> = {
   partner: "Partner",
 };
 
-export function LeadsTable({ data }: LeadsTableProps) {
+export function LeadsTable({ data, onEdit, onDelete, onAssign }: LeadsTableProps) {
+  const { t } = useLanguage();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
@@ -100,7 +108,7 @@ export function LeadsTable({ data }: LeadsTableProps) {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="-ml-4"
           >
-            Lead
+            {t.leads.lead}
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         ),
@@ -132,13 +140,13 @@ export function LeadsTable({ data }: LeadsTableProps) {
       },
       {
         accessorKey: "status",
-        header: "Status",
+        header: t.leads.status,
         cell: ({ row }) => {
           const status = row.getValue("status") as string;
-          const stage = PIPELINE_STAGES.find((s) => s.id === status);
+          const statusKey = status as keyof typeof t.leadStatus;
           return (
             <Badge variant="outline" className={cn("font-normal", statusColors[status])}>
-              {stage?.label || status}
+              {t.leadStatus[statusKey] || status}
             </Badge>
           );
         },
@@ -148,26 +156,28 @@ export function LeadsTable({ data }: LeadsTableProps) {
       },
       {
         accessorKey: "intent",
-        header: "Intent",
+        header: t.leads.intent,
         cell: ({ row }) => {
           const intent = row.getValue("intent") as string | null;
           if (!intent) return <span className="text-muted-foreground">-</span>;
+          const intentKey = intent as keyof typeof t.intentLevel;
           return (
             <Badge variant="secondary" className={cn("font-normal", intentColors[intent])}>
-              {intent.charAt(0).toUpperCase() + intent.slice(1)}
+              {t.intentLevel[intentKey] || intent}
             </Badge>
           );
         },
       },
       {
         accessorKey: "channel",
-        header: "Channel",
+        header: t.leads.channel,
         cell: ({ row }) => {
           const channel = row.getValue("channel") as string;
           const source = row.original.source;
+          const channelKey = channel as keyof typeof t.channels;
           return (
             <div>
-              <span className="text-sm">{channelLabels[channel] || channel}</span>
+              <span className="text-sm">{t.channels[channelKey] || channelLabels[channel] || channel}</span>
               {source && (
                 <span className="block text-xs text-muted-foreground capitalize">
                   {source.replace("_", " ")}
@@ -182,7 +192,7 @@ export function LeadsTable({ data }: LeadsTableProps) {
       },
       {
         accessorKey: "interestZone",
-        header: "Interest",
+        header: t.leads.interestZone,
         cell: ({ row }) => {
           const lead = row.original;
           return (
@@ -199,7 +209,7 @@ export function LeadsTable({ data }: LeadsTableProps) {
       },
       {
         accessorKey: "budgetMin",
-        header: "Budget",
+        header: t.leads.budget,
         cell: ({ row }) => {
           const lead = row.original;
           return (
@@ -211,10 +221,10 @@ export function LeadsTable({ data }: LeadsTableProps) {
       },
       {
         accessorKey: "assignedTo",
-        header: "Assigned",
+        header: t.leads.assignedTo,
         cell: ({ row }) => {
           const assignee = row.original.assignedTo;
-          if (!assignee) return <span className="text-muted-foreground">Unassigned</span>;
+          if (!assignee) return <span className="text-muted-foreground">{t.leads.unassigned}</span>;
           return (
             <div className="flex items-center gap-2">
               <Avatar className="h-6 w-6">
@@ -235,7 +245,7 @@ export function LeadsTable({ data }: LeadsTableProps) {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="-ml-4"
           >
-            Created
+            {t.leads.createdAt}
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         ),
@@ -251,25 +261,46 @@ export function LeadsTable({ data }: LeadsTableProps) {
           return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
+                <Button variant="ghost" className="h-8 w-8 p-0 rounded-lg hover:bg-slate-100">
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
+              <DropdownMenuContent align="end" className="bg-white rounded-xl shadow-lg border-slate-200">
+                <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
                   <Link href={`/dashboard/leads/${lead.id}`}>
                     <Eye className="mr-2 h-4 w-4" />
-                    View Details
+                    {t.common.viewDetails}
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                {onEdit && (
+                  <DropdownMenuItem onClick={() => onEdit(lead.id)} className="rounded-lg cursor-pointer">
+                    <Pencil className="mr-2 h-4 w-4" />
+                    {t.leads.editLead}
+                  </DropdownMenuItem>
+                )}
+                {onAssign && (
+                  <DropdownMenuItem onClick={() => onAssign(lead.id)} className="rounded-lg cursor-pointer">
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    {t.leads.assignLead}
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem className="rounded-lg cursor-pointer">
                   <Phone className="mr-2 h-4 w-4" />
-                  Call {lead.phone}
+                  {t.common.call} {lead.phone}
                 </DropdownMenuItem>
                 {lead.email && (
-                  <DropdownMenuItem>
+                  <DropdownMenuItem className="rounded-lg cursor-pointer">
                     <Mail className="mr-2 h-4 w-4" />
-                    Email
+                    {t.common.email}
+                  </DropdownMenuItem>
+                )}
+                {onDelete && (
+                  <DropdownMenuItem
+                    onClick={() => onDelete(lead.id)}
+                    className="rounded-lg cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    {t.common.delete}
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
@@ -278,7 +309,7 @@ export function LeadsTable({ data }: LeadsTableProps) {
         },
       },
     ],
-    []
+    [onEdit, onDelete, onAssign]
   );
 
   const table = useReactTable({
@@ -311,7 +342,7 @@ export function LeadsTable({ data }: LeadsTableProps) {
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search leads..."
+            placeholder={t.leads.searchPlaceholder}
             value={globalFilter ?? ""}
             onChange={(e) => setGlobalFilter(e.target.value)}
             className="pl-9"
@@ -322,15 +353,18 @@ export function LeadsTable({ data }: LeadsTableProps) {
           onValueChange={(value) => table.getColumn("status")?.setFilterValue(value)}
         >
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder={t.leads.status} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            {PIPELINE_STAGES.map((stage) => (
-              <SelectItem key={stage.id} value={stage.id}>
-                {stage.label}
-              </SelectItem>
-            ))}
+            <SelectItem value="all">{t.properties.allStatus}</SelectItem>
+            {PIPELINE_STAGES.map((stage) => {
+              const statusKey = stage.id as keyof typeof t.leadStatus;
+              return (
+                <SelectItem key={stage.id} value={stage.id}>
+                  {t.leadStatus[statusKey] || stage.label}
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
         <Select
@@ -338,15 +372,15 @@ export function LeadsTable({ data }: LeadsTableProps) {
           onValueChange={(value) => table.getColumn("channel")?.setFilterValue(value)}
         >
           <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Channel" />
+            <SelectValue placeholder={t.leads.channel} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Channels</SelectItem>
-            <SelectItem value="meta_ads">Meta Ads</SelectItem>
-            <SelectItem value="google">Google</SelectItem>
-            <SelectItem value="portal">Portal</SelectItem>
-            <SelectItem value="referral">Referral</SelectItem>
-            <SelectItem value="partner">Partner</SelectItem>
+            <SelectItem value="all">{t.channels.all}</SelectItem>
+            <SelectItem value="meta_ads">{t.channels.meta_ads}</SelectItem>
+            <SelectItem value="google">{t.channels.google}</SelectItem>
+            <SelectItem value="portal">{t.channels.portal}</SelectItem>
+            <SelectItem value="referral">{t.channels.referral}</SelectItem>
+            <SelectItem value="partner">{t.channels.partner}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -381,7 +415,7 @@ export function LeadsTable({ data }: LeadsTableProps) {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No leads found.
+                  {t.leads.noLeads}
                 </TableCell>
               </TableRow>
             )}
@@ -392,13 +426,13 @@ export function LeadsTable({ data }: LeadsTableProps) {
       {/* Pagination */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}{" "}
-          to{" "}
+          {t.common.showing} {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}{" "}
+          {t.common.to}{" "}
           {Math.min(
             (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
             table.getFilteredRowModel().rows.length
           )}{" "}
-          of {table.getFilteredRowModel().rows.length} leads
+          {t.common.of} {table.getFilteredRowModel().rows.length} {t.nav.leads.toLowerCase()}
         </p>
         <div className="flex items-center gap-2">
           <Button
@@ -418,7 +452,7 @@ export function LeadsTable({ data }: LeadsTableProps) {
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <span className="text-sm">
-            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+            {t.common.page} {table.getState().pagination.pageIndex + 1} {t.common.of} {table.getPageCount()}
           </span>
           <Button
             variant="outline"
