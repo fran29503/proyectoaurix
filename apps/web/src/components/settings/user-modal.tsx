@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,10 +19,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, UserPlus, Mail, AlertCircle } from "lucide-react";
+import {
+  Loader2,
+  UserPlus,
+  Mail,
+  AlertCircle,
+  LayoutDashboard,
+  Users as UsersIcon,
+  Building2,
+  KanbanSquare,
+  ClipboardList,
+  UsersRound,
+  BarChart3,
+  RotateCcw,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n";
-import { useCurrentUser, type Role, roleDisplayNames } from "@/lib/rbac";
+import {
+  useCurrentUser,
+  type Role,
+  type Resource,
+  roleDisplayNames,
+  getDefaultModules,
+} from "@/lib/rbac";
 import {
   createUser,
   updateUser,
@@ -33,6 +54,17 @@ import {
   type CreateUserInput,
   type UpdateUserInput,
 } from "@/lib/queries/user-management";
+
+// Modules available for toggle (settings is always determined by role, not toggleable)
+const TOGGLEABLE_MODULES: { key: Resource; icon: typeof LayoutDashboard }[] = [
+  { key: "dashboard", icon: LayoutDashboard },
+  { key: "leads", icon: UsersIcon },
+  { key: "pipeline", icon: KanbanSquare },
+  { key: "properties", icon: Building2 },
+  { key: "tasks", icon: ClipboardList },
+  { key: "team", icon: UsersRound },
+  { key: "reports", icon: BarChart3 },
+];
 
 interface UserModalProps {
   open: boolean;
@@ -65,10 +97,27 @@ export function UserModal({
   const [market, setMarket] = useState<"dubai" | "usa" | "">("");
   const [team, setTeam] = useState("");
   const [sendInvite, setSendInvite] = useState(true);
+  const [enabledModules, setEnabledModules] = useState<Set<Resource>>(new Set());
+  const [hasCustomModules, setHasCustomModules] = useState(false);
 
   // UI state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Default modules for the currently selected role
+  const defaultModules = useMemo(() => {
+    if (!role) return new Set<Resource>();
+    return new Set(getDefaultModules(role as Role));
+  }, [role]);
+
+  // Check if current modules differ from role defaults
+  const isCustomized = useMemo(() => {
+    if (!role) return false;
+    const defaults = getDefaultModules(role as Role);
+    if (enabledModules.size !== defaults.length) return true;
+    return defaults.some((m) => !enabledModules.has(m)) ||
+           Array.from(enabledModules).some((m) => !defaults.includes(m));
+  }, [role, enabledModules]);
 
   // Reset form when modal opens/closes or user changes
   useEffect(() => {
@@ -82,20 +131,64 @@ export function UserModal({
         setMarket(user.market || "");
         setTeam(user.team || "");
         setSendInvite(false);
+        // Load custom modules or defaults
+        if (user.enabled_modules) {
+          setEnabledModules(new Set(user.enabled_modules as Resource[]));
+          setHasCustomModules(true);
+        } else {
+          setEnabledModules(new Set(getDefaultModules(user.role)));
+          setHasCustomModules(false);
+        }
       } else {
         // Creating new user
         setFullName("");
         setEmail("");
         setPhone("");
-        setRole(creatableRoles[0] || "");
-        // If manager, default to their market
-        setMarket(managementScope === "market" && currentUserMarket ? (currentUserMarket as "dubai" | "usa") : "");
+        const defaultRole = creatableRoles[0] || "";
+        setRole(defaultRole);
+        setMarket(
+          managementScope === "market" && currentUserMarket
+            ? (currentUserMarket as "dubai" | "usa")
+            : ""
+        );
         setTeam("");
         setSendInvite(true);
+        setEnabledModules(
+          defaultRole ? new Set(getDefaultModules(defaultRole)) : new Set()
+        );
+        setHasCustomModules(false);
       }
       setError(null);
     }
   }, [open, user, creatableRoles, managementScope, currentUserMarket]);
+
+  // When role changes, reset modules to that role's defaults (unless user had custom)
+  const handleRoleChange = (newRole: Role) => {
+    setRole(newRole);
+    if (!hasCustomModules) {
+      setEnabledModules(new Set(getDefaultModules(newRole)));
+    }
+  };
+
+  const toggleModule = (module: Resource) => {
+    setHasCustomModules(true);
+    setEnabledModules((prev) => {
+      const next = new Set(prev);
+      if (next.has(module)) {
+        next.delete(module);
+      } else {
+        next.add(module);
+      }
+      return next;
+    });
+  };
+
+  const resetToDefaults = () => {
+    if (role) {
+      setEnabledModules(new Set(getDefaultModules(role as Role)));
+      setHasCustomModules(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,6 +212,10 @@ export function UserModal({
 
     setLoading(true);
 
+    // Determine if we need to store custom modules
+    // If modules match role defaults exactly, store null
+    const modulesToSave = isCustomized ? Array.from(enabledModules) : null;
+
     try {
       if (isEditing) {
         // Update existing user
@@ -128,6 +225,7 @@ export function UserModal({
           market: market || null,
           team: team || null,
           phone: phone.trim() || null,
+          enabled_modules: modulesToSave,
         };
 
         const { error: updateError } = await updateUser(user.id, input);
@@ -150,9 +248,13 @@ export function UserModal({
           market: market || null,
           team: team || null,
           phone: phone.trim() || null,
+          enabled_modules: modulesToSave,
         };
 
-        const { user: newUser, error: createError } = await createUser(input, currentUser.id);
+        const { user: newUser, error: createError } = await createUser(
+          input,
+          currentUser.id
+        );
 
         if (createError || !newUser) {
           setError(createError || "Failed to create user");
@@ -184,7 +286,7 @@ export function UserModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-white rounded-2xl">
+      <DialogContent className="sm:max-w-[540px] bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl">
@@ -196,7 +298,8 @@ export function UserModal({
             <DialogDescription>
               {isEditing
                 ? t.settings?.editUserDesc || "Update user information and role"
-                : t.settings?.addUserDesc || "Add a new team member to your organization"}
+                : t.settings?.addUserDesc ||
+                  "Add a new team member to your organization"}
             </DialogDescription>
           </DialogHeader>
 
@@ -211,7 +314,9 @@ export function UserModal({
 
             {/* Full Name */}
             <div className="space-y-2">
-              <Label htmlFor="fullName">{t.form?.fullName || "Full Name"} *</Label>
+              <Label htmlFor="fullName">
+                {t.form?.fullName || "Full Name"} *
+              </Label>
               <Input
                 id="fullName"
                 value={fullName}
@@ -257,27 +362,117 @@ export function UserModal({
               <Label>{t.team?.role || "Role"} *</Label>
               <Select
                 value={role}
-                onValueChange={(value) => setRole(value as Role)}
-                disabled={loading || (isEditing && !creatableRoles.includes(user?.role as Role))}
+                onValueChange={(value) => handleRoleChange(value as Role)}
+                disabled={
+                  loading ||
+                  (isEditing && !creatableRoles.includes(user?.role as Role))
+                }
               >
                 <SelectTrigger className="rounded-xl">
-                  <SelectValue placeholder={t.settings?.selectRole || "Select role"} />
+                  <SelectValue
+                    placeholder={t.settings?.selectRole || "Select role"}
+                  />
                 </SelectTrigger>
                 <SelectContent className="bg-white">
                   {creatableRoles.map((r) => (
                     <SelectItem key={r} value={r}>
-                      {t.roles?.[r as keyof typeof t.roles] || roleDisplayNames[r]}
+                      {t.roles?.[r as keyof typeof t.roles] ||
+                        roleDisplayNames[r]}
                     </SelectItem>
                   ))}
-                  {/* If editing a user with a role we can't create, still show their current role */}
-                  {isEditing && !creatableRoles.includes(user?.role as Role) && (
-                    <SelectItem value={user?.role || ""} disabled>
-                      {t.roles?.[user?.role as keyof typeof t.roles] || user?.role}
-                    </SelectItem>
-                  )}
+                  {isEditing &&
+                    user?.role &&
+                    !creatableRoles.includes(user.role) && (
+                      <SelectItem value={user.role} disabled>
+                        {t.roles?.[user.role as keyof typeof t.roles] ||
+                          user.role}
+                      </SelectItem>
+                    )}
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Module Access Toggles */}
+            {role && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>
+                      {t.settings?.moduleAccess || "Module Access"}
+                    </Label>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      {t.settings?.moduleAccessDesc ||
+                        "Toggle which modules this user can access"}
+                    </p>
+                  </div>
+                  {isCustomized && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={resetToDefaults}
+                      className="text-xs text-violet-600 hover:text-violet-700 gap-1 h-7"
+                    >
+                      <RotateCcw className="h-3 w-3" />
+                      {t.settings?.resetToDefaults || "Reset to defaults"}
+                    </Button>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {TOGGLEABLE_MODULES.map(({ key, icon: Icon }) => {
+                    const isEnabled = enabledModules.has(key);
+                    const isDefault = defaultModules.has(key);
+                    const isOverridden = isEnabled !== isDefault;
+
+                    return (
+                      <div
+                        key={key}
+                        className={cn(
+                          "flex items-center justify-between p-2.5 rounded-xl border transition-all",
+                          isEnabled
+                            ? "border-violet-200 bg-violet-50/50"
+                            : "border-slate-200 bg-slate-50/50",
+                          isOverridden && "ring-1 ring-amber-300"
+                        )}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Icon
+                            className={cn(
+                              "h-4 w-4",
+                              isEnabled
+                                ? "text-violet-600"
+                                : "text-slate-400"
+                            )}
+                          />
+                          <span
+                            className={cn(
+                              "text-sm font-medium",
+                              isEnabled
+                                ? "text-slate-900"
+                                : "text-slate-400"
+                            )}
+                          >
+                            {t.nav?.[key] || key}
+                          </span>
+                        </div>
+                        <Switch
+                          checked={isEnabled}
+                          onCheckedChange={() => toggleModule(key)}
+                          disabled={loading}
+                          className="scale-90"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+                {isCustomized && (
+                  <p className="text-xs text-amber-600 flex items-center gap-1">
+                    <span className="inline-block w-2 h-2 rounded-full bg-amber-400" />
+                    {t.settings?.customAccess || "Custom access configured"}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Market (only if scope allows) */}
             {managementScope === "all" && (
@@ -287,19 +482,23 @@ export function UserModal({
                   value={market}
                   onValueChange={(value) => {
                     setMarket(value as "dubai" | "usa");
-                    // Reset team if market changes
                     setTeam("");
                   }}
                   disabled={loading}
                 >
                   <SelectTrigger className="rounded-xl">
-                    <SelectValue placeholder={t.settings?.selectMarket || "Select market"} />
+                    <SelectValue
+                      placeholder={
+                        t.settings?.selectMarket || "Select market"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     {marketOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.value === "dubai" ? "🇦🇪 " : "🇺🇸 "}
-                        {t.market?.[option.value as keyof typeof t.market] || option.label}
+                        {t.market?.[option.value as keyof typeof t.market] ||
+                          option.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -311,15 +510,21 @@ export function UserModal({
             <div className="space-y-2">
               <Label>{t.table?.team || "Team"}</Label>
               <Select
-                value={team}
-                onValueChange={setTeam}
+                value={team || "none"}
+                onValueChange={(value) =>
+                  setTeam(value === "none" ? "" : value)
+                }
                 disabled={loading}
               >
                 <SelectTrigger className="rounded-xl">
-                  <SelectValue placeholder={t.settings?.selectTeam || "Select team"} />
+                  <SelectValue
+                    placeholder={t.settings?.selectTeam || "Select team"}
+                  />
                 </SelectTrigger>
                 <SelectContent className="bg-white">
-                  <SelectItem value="">{t.common?.none || "None"}</SelectItem>
+                  <SelectItem value="none">
+                    {t.common?.none || "None"}
+                  </SelectItem>
                   {filteredTeamOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
@@ -335,7 +540,9 @@ export function UserModal({
                 <Checkbox
                   id="sendInvite"
                   checked={sendInvite}
-                  onCheckedChange={(checked: boolean | "indeterminate") => setSendInvite(checked === true)}
+                  onCheckedChange={(checked: boolean | "indeterminate") =>
+                    setSendInvite(checked === true)
+                  }
                   disabled={loading}
                 />
                 <Label

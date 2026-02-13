@@ -13,11 +13,9 @@ export interface User {
   phone: string | null;
   avatar_url: string | null;
   is_active: boolean;
+  enabled_modules: string[] | null;
   created_at: string;
   updated_at: string;
-  created_by: string | null;
-  invited_at: string | null;
-  invitation_status: "pending" | "accepted" | "expired" | null;
 }
 
 export interface CreateUserInput {
@@ -27,6 +25,7 @@ export interface CreateUserInput {
   team?: string | null;
   market?: "dubai" | "usa" | null;
   phone?: string | null;
+  enabled_modules?: string[] | null;
 }
 
 export interface UpdateUserInput {
@@ -36,6 +35,7 @@ export interface UpdateUserInput {
   market?: "dubai" | "usa" | null;
   phone?: string | null;
   is_active?: boolean;
+  enabled_modules?: string[] | null;
 }
 
 export interface UserFilters {
@@ -174,9 +174,7 @@ export async function createUser(
       phone: input.phone || null,
       tenant_id: currentUser.tenant_id,
       is_active: true,
-      created_by: createdBy,
-      invited_at: new Date().toISOString(),
-      invitation_status: "pending",
+      enabled_modules: input.enabled_modules || null,
     })
     .select()
     .single();
@@ -301,27 +299,8 @@ export async function sendInvitation(
   if (inviteError) {
     // If admin invite fails (requires service role), try alternative approach
     console.warn("Admin invite failed, user may need to sign up manually:", inviteError);
-
-    // Update invitation status
-    await supabase
-      .from("users")
-      .update({
-        invited_at: new Date().toISOString(),
-        invitation_status: "pending",
-      })
-      .eq("id", userId);
-
     return { success: true, error: null };
   }
-
-  // Update invitation status
-  await supabase
-    .from("users")
-    .update({
-      invited_at: new Date().toISOString(),
-      invitation_status: "pending",
-    })
-    .eq("id", userId);
 
   return { success: true, error: null };
 }
@@ -347,7 +326,7 @@ export async function getUserStats(
 ) {
   const supabase = createClient();
 
-  let query = supabase.from("users").select("role, market, team, is_active, invitation_status");
+  let query = supabase.from("users").select("role, market, team, is_active, auth_id");
 
   if (managementScope) {
     if (managementScope.scope === "none") {
@@ -370,7 +349,7 @@ export async function getUserStats(
 
   const total = users?.length || 0;
   const active = users?.filter((u) => u.is_active).length || 0;
-  const pending = users?.filter((u) => u.invitation_status === "pending").length || 0;
+  const pending = users?.filter((u) => !u.auth_id && u.is_active).length || 0;
   const byRole: Record<string, number> = {};
   const byMarket: Record<string, number> = {};
 

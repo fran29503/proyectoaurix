@@ -104,18 +104,53 @@ export const navPermissions: Record<Role, Resource[]> = {
 };
 
 /**
+ * Get the default modules a role has access to
+ */
+export function getDefaultModules(role: Role): Resource[] {
+  return navPermissions[role] || [];
+}
+
+/**
+ * Check if a user has access to a module, considering custom overrides
+ */
+export function hasModuleAccess(
+  role: Role,
+  resource: Resource,
+  enabledModules: Resource[] | null
+): boolean {
+  if (enabledModules === null) {
+    // No overrides - use role defaults
+    return navPermissions[role]?.includes(resource) || false;
+  }
+  return enabledModules.includes(resource);
+}
+
+/**
  * Check if a role has permission to perform an action on a resource
  */
 export function hasPermission(
   role: Role,
   resource: Resource,
-  action: Action
+  action: Action,
+  enabledModules?: Resource[] | null
 ): boolean {
+  // If custom modules are set, check module access first
+  if (enabledModules !== undefined && enabledModules !== null) {
+    if (!enabledModules.includes(resource)) return false;
+  }
+
   const permissions = rolePermissions[role];
   if (!permissions) return false;
 
   const resourcePermission = permissions.find(p => p.resource === resource);
-  if (!resourcePermission) return false;
+  if (!resourcePermission) {
+    // If the role doesn't have this resource by default but it's in enabledModules,
+    // grant basic view access
+    if (enabledModules?.includes(resource)) {
+      return action === "view";
+    }
+    return false;
+  }
 
   return resourcePermission.actions.includes(action);
 }
@@ -135,10 +170,14 @@ export function getDataScope(
 }
 
 /**
- * Check if a role can see a navigation item
+ * Check if a role can see a navigation item, considering custom overrides
  */
-export function canAccessNav(role: Role, resource: Resource): boolean {
-  return navPermissions[role]?.includes(resource) || false;
+export function canAccessNav(
+  role: Role,
+  resource: Resource,
+  enabledModules?: Resource[] | null
+): boolean {
+  return hasModuleAccess(role, resource, enabledModules ?? null);
 }
 
 /**

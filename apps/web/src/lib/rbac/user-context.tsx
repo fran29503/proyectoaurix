@@ -18,6 +18,7 @@ import {
   getDataScope,
   canAccessNav,
   getRolePermissions,
+  hasModuleAccess,
   type Permission,
 } from "./permissions";
 
@@ -37,6 +38,7 @@ export interface CurrentUser {
   isActive: boolean;
   tenantId: string;
   createdAt: string;
+  enabledModules: Resource[] | null;
 }
 
 interface UserContextType {
@@ -81,6 +83,7 @@ const DEMO_USER: CurrentUser = {
   isActive: true,
   tenantId: "demo-tenant",
   createdAt: new Date().toISOString(),
+  enabledModules: null,
 };
 
 export function UserProvider({ children }: { children: ReactNode }) {
@@ -174,6 +177,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       isActive: (dbUser.is_active as boolean) ?? true,
       tenantId: (dbUser.tenant_id as string) || "",
       createdAt: dbUser.created_at as string,
+      enabledModules: (dbUser.enabled_modules as Resource[]) || null,
     };
   }
 
@@ -201,6 +205,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   // Memoized context value
   const contextValue = useMemo<UserContextType>(() => {
     const role = user?.role || "agent";
+    const modules = user?.enabledModules ?? null;
 
     return {
       user,
@@ -212,11 +217,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
       // Permission helpers
       can: (resource: Resource, action: Action) => {
         if (!user) return false;
-        return hasPermission(role, resource, action);
+        return hasPermission(role, resource, action, modules);
       },
       canAccessNavItem: (resource: Resource) => {
         if (!user) return false;
-        return canAccessNav(role, resource);
+        return canAccessNav(role, resource, modules);
       },
       getScope: (resource: Resource) => getDataScope(role, resource),
       permissions: getRolePermissions(role),

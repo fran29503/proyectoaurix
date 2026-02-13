@@ -527,5 +527,9 @@ export const ar: Translations = {
     userCreated: "تم إنشاء المستخدم بنجاح",
     userUpdated: "تم تحديث المستخدم بنجاح",
     invitationSent: "تم إرسال الدعوة",
+    moduleAccess: "الوصول إلى الوحدات",
+    moduleAccessDesc: "تبديل الوحدات التي يمكن لهذا المستخدم الوصول إليها",
+    resetToDefaults: "إعادة تعيين الافتراضي",
+    customAccess: "تم تكوين وصول مخصص",
   },
 };

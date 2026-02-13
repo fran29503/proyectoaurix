@@ -525,6 +525,10 @@ export const en = {
     userCreated: "User created successfully",
     userUpdated: "User updated successfully",
     invitationSent: "Invitation sent",
+    moduleAccess: "Module Access",
+    moduleAccessDesc: "Toggle which modules this user can access",
+    resetToDefaults: "Reset to defaults",
+    customAccess: "Custom access configured",
   },
 };
 

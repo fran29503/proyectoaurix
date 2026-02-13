@@ -38,7 +38,7 @@ export async function getProfile(): Promise<ProfileData | null> {
 
   const { data, error } = await supabase
     .from("users")
-    .select("id, email, full_name, phone, avatar_url, language, notifications_email, notifications_push, notifications_sla, theme")
+    .select("id, email, full_name, phone, avatar_url")
     .eq("auth_id", user.id)
     .single();
 
@@ -49,11 +49,11 @@ export async function getProfile(): Promise<ProfileData | null> {
 
   return {
     ...data,
-    language: data.language || "en",
-    notifications_email: data.notifications_email ?? true,
-    notifications_push: data.notifications_push ?? true,
-    notifications_sla: data.notifications_sla ?? true,
-    theme: data.theme || "system",
+    language: localStorage.getItem("aurix-language") || "en",
+    notifications_email: true,
+    notifications_push: true,
+    notifications_sla: true,
+    theme: "system",
   } as ProfileData;
 }
 
@@ -73,12 +73,17 @@ export async function updateProfile(
     return { success: false, error: "Not authenticated" };
   }
 
+  // Only send fields that exist in the DB
+  const dbFields: Record<string, unknown> = {
+    updated_at: new Date().toISOString(),
+  };
+  if (input.full_name !== undefined) dbFields.full_name = input.full_name;
+  if (input.phone !== undefined) dbFields.phone = input.phone;
+  if (input.avatar_url !== undefined) dbFields.avatar_url = input.avatar_url;
+
   const { error } = await supabase
     .from("users")
-    .update({
-      ...input,
-      updated_at: new Date().toISOString(),
-    })
+    .update(dbFields)
     .eq("auth_id", user.id);
 
   if (error) {

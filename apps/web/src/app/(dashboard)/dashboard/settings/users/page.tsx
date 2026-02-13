@@ -201,7 +201,7 @@ export default function UserManagementPage() {
 
   const getUserStatus = (user: User): string => {
     if (!user.is_active) return "inactive";
-    if (user.invitation_status === "pending") return "pending";
+    if (!user.auth_id) return "pending";
     return "active";
   };
 

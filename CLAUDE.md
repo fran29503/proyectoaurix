@@ -232,14 +232,17 @@ Ubicado en el header, dentro del menú de usuario.
 - [x] User Management (Settings > Users)
 - [x] Profile Settings (personal info, notifications, security, appearance)
 - [x] Audit Log (tracking de acciones)
-- [x] Row-Level Security SQL (migrations creadas)
+- [x] Row-Level Security SQL (migrations creadas y aplicadas en DB)
+- [x] MCP de Supabase activado y operativo
+- [x] Migration 004_audit_logs.sql ejecutada en Supabase
+- [x] Migration 005_row_level_security.sql ejecutada en Supabase (funciones helper + policies)
+- [x] Usuario admin configurado con email fran@aurix-ia.com
+- [x] Limpieza de usuarios de prueba en auth.users y public.users
+- [x] Eliminación de políticas RLS inseguras (anon_all_*) para desarrollo
 
 ### Pendiente
-- [ ] **URGENTE:** Configurar usuario admin con email fran@aurix-ia.com
-- [ ] Ejecutar migration 004_audit_logs.sql en Supabase
-- [ ] Ejecutar migration 005_row_level_security.sql en Supabase
-- [ ] Activar MCP de Supabase en Claude Code (plugin habilitado, reiniciar CLI)
-- [ ] Conectar audit logging real (actualmente funciones creadas pero no conectadas)
+- [ ] Conectar audit logging real (funciones DB creadas, falta integrar desde frontend)
+- [ ] Probar login con fran@aurix-ia.com (requiere password reset o magic link)
 - [ ] Implementar Reports con gráficos dinámicos
 - [ ] Notificaciones push/email
 - [ ] Dark mode
@@ -248,16 +251,13 @@ Ubicado en el header, dentro del menú de usuario.
 
 ## Credenciales y Acceso
 
-### Usuario Admin (A ACTUALIZAR)
-- **Email actual:** admin@meridianharbor.ae (ficticio, sin acceso)
-- **Email nuevo:** fran@aurix-ia.com
-- **Acción requerida:** Eliminar usuario actual en Supabase Auth y crear nuevo con email correcto
-
-### Proceso para crear nuevo admin
-1. Supabase Dashboard > Authentication > Users
-2. Eliminar usuario con email admin@meridianharbor.ae
-3. Crear nuevo usuario con email fran@aurix-ia.com
-4. Actualizar tabla public.users con el nuevo auth_id
+### Usuario Admin (CONFIGURADO)
+- **Email:** fran@aurix-ia.com
+- **auth_id:** 25e27fbb-77a3-4cde-99d1-30099728cda1
+- **user_id (public.users):** 24178797-1bed-4ece-855b-c51ecc631513
+- **Rol:** admin
+- **Tenant:** Meridian Harbor Realty (11111111-1111-1111-1111-111111111111)
+- **Estado:** Activo, auth.users y public.users sincronizados
 
 ---
 
@@ -303,10 +303,10 @@ Ubicado en el header, dentro del menú de usuario.
 
 ## Próximos Pasos Inmediatos
 
-1. **Reiniciar Claude Code** para activar MCP de Supabase
-2. **Verificar herramientas Supabase** disponibles
-3. **Actualizar usuario admin** a fran@aurix-ia.com
-4. **Ejecutar migrations** de audit y RLS en Supabase
+1. **Probar login** con fran@aurix-ia.com (password reset via Supabase Dashboard o magic link)
+2. **Conectar audit logging** desde frontend a la función `log_audit_action()` en DB
+3. **Implementar Reports** con gráficos dinámicos (Recharts)
+4. **Dark mode** con CSS variables + Tailwind
 5. **Probar login** con nuevo usuario
 
 ---

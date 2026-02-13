@@ -527,5 +527,9 @@ export const es: Translations = {
     userCreated: "Usuario creado exitosamente",
     userUpdated: "Usuario actualizado exitosamente",
     invitationSent: "Invitación enviada",
+    moduleAccess: "Acceso a Módulos",
+    moduleAccessDesc: "Activa o desactiva los módulos a los que este usuario puede acceder",
+    resetToDefaults: "Restablecer por defecto",
+    customAccess: "Acceso personalizado configurado",
   },
 };
