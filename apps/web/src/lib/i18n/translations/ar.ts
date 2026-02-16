@@ -210,6 +210,16 @@ export const ar: Translations = {
     operation: "العملية",
     tryAdjustingFilters: "حاول تعديل المرشحات",
     retry: "إعادة المحاولة",
+    description: "الوصف",
+    features: "المميزات والمرافق",
+    details: "تفاصيل العقار",
+    developer: "المطور",
+    tags: "العلامات",
+    interestedLeads: "العملاء المهتمون",
+    noInterestedLeads: "لا يوجد عملاء مهتمون بعد",
+    paymentPlan: "خطة دفع متاحة",
+    generatePdf: "إنشاء كتيب PDF",
+    shareWithLead: "مشاركة مع العميل",
   },
 
   // المهام

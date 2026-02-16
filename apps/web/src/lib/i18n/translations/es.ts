@@ -210,6 +210,16 @@ export const es: Translations = {
     operation: "Operación",
     tryAdjustingFilters: "Intenta ajustar tus filtros",
     retry: "Reintentar",
+    description: "Descripción",
+    features: "Características y Amenidades",
+    details: "Detalles de la Propiedad",
+    developer: "Desarrollador",
+    tags: "Etiquetas",
+    interestedLeads: "Leads Interesados",
+    noInterestedLeads: "Aún no hay leads interesados",
+    paymentPlan: "Plan de Pago Disponible",
+    generatePdf: "Generar PDF Brochure",
+    shareWithLead: "Compartir con Lead",
   },
 
   // Tareas

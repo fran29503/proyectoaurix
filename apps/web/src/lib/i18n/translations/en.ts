@@ -208,6 +208,16 @@ export const en = {
     operation: "Operation",
     tryAdjustingFilters: "Try adjusting your filters",
     retry: "Retry",
+    description: "Description",
+    features: "Features & Amenities",
+    details: "Property Details",
+    developer: "Developer",
+    tags: "Tags",
+    interestedLeads: "Interested Leads",
+    noInterestedLeads: "No interested leads yet",
+    paymentPlan: "Payment Plan Available",
+    generatePdf: "Generate PDF Brochure",
+    shareWithLead: "Share with Lead",
   },
 
   // Tasks

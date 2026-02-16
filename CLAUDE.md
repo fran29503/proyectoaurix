@@ -17,7 +17,7 @@
 - Sistema de tareas y recordatorios
 - Gestión de equipos y usuarios
 - Multi-tenancy (múltiples organizaciones)
-- Internacionalización (4 idiomas: EN, ES, AR, FR)
+- Internacionalización (3 idiomas: EN, ES, AR)
 - Sistema de permisos RBAC completo
 - Audit logging para tracking de acciones
 
@@ -197,7 +197,6 @@ backoffice: leads (view all), properties (all), tasks (own)
 | en | English | LTR |
 | es | Español | LTR |
 | ar | العربية (Arabic) | RTL |
-| fr | Français | LTR |
 
 ### Uso
 ```typescript
@@ -228,7 +227,7 @@ Ubicado en el header, dentro del menú de usuario.
 - [x] Sistema de Autenticación completo
 - [x] Multi-tenancy
 - [x] Sistema RBAC completo (frontend)
-- [x] Sistema i18n (4 idiomas + RTL)
+- [x] Sistema i18n (3 idiomas: EN, ES, AR + RTL)
 - [x] User Management (Settings > Users)
 - [x] Profile Settings (personal info, notifications, security, appearance)
 - [x] Audit Log (tracking de acciones)
@@ -315,7 +314,7 @@ Ubicado en el header, dentro del menú de usuario.
 
 - El proyecto usa **App Router** de Next.js (no Pages Router)
 - Autenticación maneja **cookies** via @supabase/ssr
-- Las traducciones deben agregarse en **los 4 idiomas** cuando se añade texto nuevo
+- Las traducciones deben agregarse en **los 3 idiomas (EN, ES, AR)** cuando se añade texto nuevo
 - El campo `market` en la tabla users es un **ENUM**, puede requerir cast `::text` en comparaciones SQL
 - RTL para árabe se maneja automáticamente con `document.dir = 'rtl'`
 

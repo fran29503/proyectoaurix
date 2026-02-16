@@ -135,6 +135,39 @@ export async function getPropertiesStats() {
   };
 }
 
+export interface InterestedLead {
+  id: string;
+  full_name: string;
+  status: string;
+  budget_min: number | null;
+  budget_max: number | null;
+  budget_currency: string;
+}
+
+export async function getInterestedLeads(
+  zone: string,
+  market: string,
+  limit = 5
+): Promise<InterestedLead[]> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("leads")
+    .select("id, full_name, status, budget_min, budget_max, budget_currency")
+    .eq("interest_zone", zone)
+    .eq("market", market)
+    .not("status", "in", '("cerrado_ganado","cerrado_perdido")')
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("Error fetching interested leads:", error);
+    return [];
+  }
+
+  return data || [];
+}
+
 export function formatPropertyPrice(price: number, currency: string): string {
   if (currency === "AED") {
     if (price >= 1000000) {

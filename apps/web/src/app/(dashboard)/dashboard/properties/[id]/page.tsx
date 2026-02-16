@@ -1,10 +1,12 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { useParams } from "next/navigation";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft,
   Building2,
@@ -12,7 +14,6 @@ import {
   Bed,
   Bath,
   Maximize,
-  Calendar,
   Edit,
   FileText,
   Share2,
@@ -20,15 +21,18 @@ import {
   DollarSign,
   Tag,
   CheckCircle,
-  MoreHorizontal,
+  Loader2,
 } from "lucide-react";
-import { cn, getInitials, formatDate } from "@/lib/utils";
-import { propertiesData, formatPropertyPrice } from "@/lib/data/properties";
-import { leadsData } from "@/lib/data/leads";
-
-interface PageProps {
-  params: Promise<{ id: string }>;
-}
+import { cn, getInitials } from "@/lib/utils";
+import {
+  getPropertyById,
+  getInterestedLeads,
+  formatPropertyPrice,
+  type Property,
+  type InterestedLead,
+} from "@/lib/queries/properties";
+import { useLanguage } from "@/lib/i18n";
+import { motion } from "framer-motion";
 
 const statusColors: Record<string, { bg: string; text: string }> = {
   disponible: { bg: "bg-emerald-100", text: "text-emerald-700" },
@@ -42,23 +46,64 @@ const operationLabels: Record<string, string> = {
   rent: "Rent",
 };
 
-export default async function PropertyDetailPage({ params }: PageProps) {
-  const { id } = await params;
-  const property = propertiesData.find((p) => p.id === id);
+export default function PropertyDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const { t } = useLanguage();
+  const [property, setProperty] = useState<Property | null>(null);
+  const [interestedLeads, setInterestedLeads] = useState<InterestedLead[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
-  if (!property) {
-    notFound();
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      const prop = await getPropertyById(id);
+      if (!prop) {
+        setNotFound(true);
+        setLoading(false);
+        return;
+      }
+      setProperty(prop);
+
+      const leads = await getInterestedLeads(prop.zone, prop.market);
+      setInterestedLeads(leads);
+      setLoading(false);
+    }
+    fetchData();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-32">
+        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+        <span className="ml-3 text-sm text-muted-foreground">{t.common.loading}</span>
+      </div>
+    );
   }
 
-  const statusStyle = statusColors[property.status];
+  if (notFound || !property) {
+    return (
+      <div className="flex flex-col items-center justify-center py-32 text-center">
+        <Building2 className="h-12 w-12 text-slate-300 mb-4" />
+        <p className="text-lg font-medium text-slate-700">{t.common.noResults}</p>
+        <Link href="/dashboard/properties" className="mt-4">
+          <Button variant="outline">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            {t.common.back}
+          </Button>
+        </Link>
+      </div>
+    );
+  }
 
-  // Get interested leads (mock - in real app would query by property)
-  const interestedLeads = leadsData
-    .filter((l) => l.interestZone === property.zone)
-    .slice(0, 5);
+  const statusStyle = statusColors[property.status] || { bg: "bg-slate-100", text: "text-slate-600" };
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-6"
+    >
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-4">
@@ -75,9 +120,9 @@ export default async function PropertyDetailPage({ params }: PageProps) {
               </Badge>
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
-              <span className="text-lg">{property.market === "dubai" ? "🇦🇪" : "🇺🇸"}</span>
+              <span className="text-lg">{property.market === "dubai" ? "\u{1F1E6}\u{1F1EA}" : "\u{1F1FA}\u{1F1F8}"}</span>
               <span>{property.code}</span>
-              <span>•</span>
+              <span>&bull;</span>
               <MapPin className="h-4 w-4" />
               <span>{property.zone}</span>
             </div>
@@ -86,15 +131,15 @@ export default async function PropertyDetailPage({ params }: PageProps) {
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm">
             <Share2 className="mr-2 h-4 w-4" />
-            Share
+            {t.common.share}
           </Button>
           <Button variant="outline" size="sm">
             <FileText className="mr-2 h-4 w-4" />
-            Generate PDF
+            {t.common.pdf}
           </Button>
           <Button variant="outline" size="sm">
             <Edit className="mr-2 h-4 w-4" />
-            Edit
+            {t.common.edit}
           </Button>
         </div>
       </div>
@@ -109,7 +154,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                 <Building2 className="h-24 w-24 text-slate-400" />
                 <div className="absolute bottom-4 right-4 flex gap-2">
                   <Badge variant="secondary" className="bg-white/90">
-                    1 / 1 photos
+                    {property.images?.length || 0} photos
                   </Badge>
                 </div>
               </div>
@@ -117,39 +162,40 @@ export default async function PropertyDetailPage({ params }: PageProps) {
           </Card>
 
           {/* Description */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Description</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">{property.description}</p>
-            </CardContent>
-          </Card>
+          {property.description && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">{t.properties.description}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">{property.description}</p>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Features */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Features & Amenities</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {property.features.map((feature) => (
-                  <div
-                    key={feature}
-                    className="flex items-center gap-2 text-sm"
-                  >
-                    <CheckCircle className="h-4 w-4 text-emerald-500" />
-                    {feature}
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          {property.features && property.features.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">{t.properties.features}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {property.features.map((feature) => (
+                    <div key={feature} className="flex items-center gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-emerald-500" />
+                      {feature}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Interested Leads */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-base">Interested Leads</CardTitle>
+              <CardTitle className="text-base">{t.properties.interestedLeads}</CardTitle>
               <Badge variant="secondary">{interestedLeads.length}</Badge>
             </CardHeader>
             <CardContent>
@@ -164,13 +210,13 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9">
                           <AvatarFallback className="bg-navy-950 text-white text-xs">
-                            {getInitials(lead.fullName)}
+                            {getInitials(lead.full_name)}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium text-sm">{lead.fullName}</p>
+                          <p className="font-medium text-sm">{lead.full_name}</p>
                           <p className="text-xs text-muted-foreground">
-                            {lead.budgetCurrency} {lead.budgetMin?.toLocaleString()} - {lead.budgetMax?.toLocaleString()}
+                            {lead.budget_currency} {lead.budget_min?.toLocaleString()} - {lead.budget_max?.toLocaleString()}
                           </p>
                         </div>
                       </div>
@@ -183,7 +229,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
               ) : (
                 <div className="text-center py-8">
                   <Users className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">No interested leads yet</p>
+                  <p className="text-sm text-muted-foreground">{t.properties.noInterestedLeads}</p>
                 </div>
               )}
             </CardContent>
@@ -195,17 +241,17 @@ export default async function PropertyDetailPage({ params }: PageProps) {
           {/* Price Card */}
           <Card className="border-copper-200 bg-copper-50/30">
             <CardContent className="p-6">
-              <p className="text-sm text-muted-foreground mb-1">Price</p>
+              <p className="text-sm text-muted-foreground mb-1">{t.properties.price}</p>
               <p className="text-3xl font-bold text-navy-950">
                 {formatPropertyPrice(property.price, property.currency)}
               </p>
               <div className="flex items-center gap-2 mt-2">
                 <Badge variant="secondary">
-                  {operationLabels[property.operation]}
+                  {operationLabels[property.operation] || property.operation}
                 </Badge>
                 {property.operation === "off-plan" && (
                   <Badge variant="outline" className="text-xs">
-                    Payment Plan Available
+                    {t.properties.paymentPlan}
                   </Badge>
                 )}
               </div>
@@ -215,42 +261,48 @@ export default async function PropertyDetailPage({ params }: PageProps) {
           {/* Property Details */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Property Details</CardTitle>
+              <CardTitle className="text-base">{t.properties.details}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
-                  <Bed className="h-4 w-4 text-slate-600" />
+              {property.bedrooms != null && (
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
+                    <Bed className="h-4 w-4 text-slate-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">{t.properties.bedrooms}</p>
+                    <p className="font-medium">{property.bedrooms}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Bedrooms</p>
-                  <p className="font-medium">{property.bedrooms}</p>
+              )}
+              {property.bathrooms != null && (
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
+                    <Bath className="h-4 w-4 text-slate-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">{t.properties.bathrooms}</p>
+                    <p className="font-medium">{property.bathrooms}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
-                  <Bath className="h-4 w-4 text-slate-600" />
+              )}
+              {property.area && (
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
+                    <Maximize className="h-4 w-4 text-slate-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">{t.properties.area}</p>
+                    <p className="font-medium">{property.area}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Bathrooms</p>
-                  <p className="font-medium">{property.bathrooms}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
-                  <Maximize className="h-4 w-4 text-slate-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Area</p>
-                  <p className="font-medium">{property.area}</p>
-                </div>
-              </div>
+              )}
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
                   <Building2 className="h-4 w-4 text-slate-600" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Type</p>
+                  <p className="text-sm text-muted-foreground">{t.properties.type}</p>
                   <p className="font-medium">{property.type}</p>
                 </div>
               </div>
@@ -260,7 +312,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                     <Tag className="h-4 w-4 text-slate-600" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Developer</p>
+                    <p className="text-sm text-muted-foreground">{t.properties.developer}</p>
                     <p className="font-medium">{property.developer}</p>
                   </div>
                 </div>
@@ -271,7 +323,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
           {/* Location */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Location</CardTitle>
+              <CardTitle className="text-base">{t.properties.location}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="aspect-video bg-slate-100 rounded-lg flex items-center justify-center mb-3">
@@ -285,10 +337,10 @@ export default async function PropertyDetailPage({ params }: PageProps) {
           </Card>
 
           {/* Tags */}
-          {property.tags.length > 0 && (
+          {property.tags && property.tags.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Tags</CardTitle>
+                <CardTitle className="text-base">{t.properties.tags}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
@@ -307,16 +359,16 @@ export default async function PropertyDetailPage({ params }: PageProps) {
             <CardContent className="p-4 space-y-2">
               <Button className="w-full bg-copper-500 hover:bg-copper-600">
                 <FileText className="mr-2 h-4 w-4" />
-                Generate PDF Brochure
+                {t.properties.generatePdf}
               </Button>
               <Button variant="outline" className="w-full">
                 <Share2 className="mr-2 h-4 w-4" />
-                Share with Lead
+                {t.properties.shareWithLead}
               </Button>
             </CardContent>
           </Card>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
