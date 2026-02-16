@@ -134,18 +134,128 @@
   --chart-3: 160 84% 39%;
   --chart-4: 43 96% 56%;
   --chart-5: 27 96% 61%;
-
-  /* Invert custom brand colors for readability */
-  --color-navy-950: #C5D1E5;
-  --color-navy-900: #9EB2D1;
-  --color-navy-800: #7793BD;
-  --color-navy-700: #597AAD;
-  --color-slate-50: #0f172a;
-  --color-slate-100: #1e293b;
-  --color-slate-200: #334155;
-  --color-slate-800: #e2e8f0;
-  --color-slate-900: #f1f5f9;
 }
+
+/* ============================================
+   DARK MODE - Global Tailwind Utility Overrides
+   ============================================
+   These rules use .dark ancestor specificity to
+   remap hardcoded light-mode colors automatically.
+   Explicit dark: Tailwind classes take precedence
+   since they appear later in the stylesheet.
+   ============================================ */
+
+/* --- Text: dark text → light text --- */
+.dark .text-navy-950 { color: #C5D1E5; }
+.dark .text-slate-950 { color: #f8fafc; }
+.dark .text-slate-900 { color: #f1f5f9; }
+.dark .text-slate-800 { color: #e2e8f0; }
+.dark .text-slate-700 { color: #cbd5e1; }
+.dark .text-slate-600 { color: #94a3b8; }
+
+/* --- Backgrounds: light bg → dark bg --- */
+.dark .bg-white { background-color: #0a101e; }
+.dark .bg-white\/80 { background-color: rgba(10, 16, 30, 0.85); }
+.dark .bg-white\/90 { background-color: rgba(10, 16, 30, 0.92); }
+.dark .bg-slate-50 { background-color: #0f172a; }
+.dark .bg-slate-100 { background-color: #1e293b; }
+.dark .bg-slate-200 { background-color: #334155; }
+
+/* --- Backgrounds: colored tints → dark-safe tints --- */
+.dark .bg-emerald-50 { background-color: rgba(16, 185, 129, 0.1); }
+.dark .bg-emerald-100 { background-color: rgba(16, 185, 129, 0.15); }
+.dark .bg-teal-50 { background-color: rgba(20, 184, 166, 0.1); }
+.dark .bg-amber-50 { background-color: rgba(245, 158, 11, 0.1); }
+.dark .bg-amber-100 { background-color: rgba(245, 158, 11, 0.15); }
+.dark .bg-red-50 { background-color: rgba(239, 68, 68, 0.1); }
+.dark .bg-red-100 { background-color: rgba(239, 68, 68, 0.15); }
+.dark .bg-blue-50 { background-color: rgba(59, 130, 246, 0.1); }
+.dark .bg-blue-100 { background-color: rgba(59, 130, 246, 0.15); }
+.dark .bg-violet-50 { background-color: rgba(139, 92, 246, 0.1); }
+.dark .bg-violet-100 { background-color: rgba(139, 92, 246, 0.15); }
+.dark .bg-orange-50 { background-color: rgba(249, 115, 22, 0.1); }
+.dark .bg-orange-100 { background-color: rgba(249, 115, 22, 0.15); }
+.dark .bg-green-50 { background-color: rgba(34, 197, 94, 0.1); }
+.dark .bg-green-100 { background-color: rgba(34, 197, 94, 0.15); }
+.dark .bg-copper-50\/30 { background-color: rgba(184, 115, 51, 0.08); }
+.dark .bg-navy-950\/5 { background-color: rgba(139, 92, 246, 0.1); }
+
+/* --- Text: colored text on tinted bg → bright for dark bg --- */
+.dark .text-emerald-900 { color: #6ee7b7; }
+.dark .text-emerald-700 { color: #34d399; }
+.dark .text-emerald-600 { color: #34d399; }
+.dark .text-amber-900 { color: #fcd34d; }
+.dark .text-amber-700 { color: #fbbf24; }
+.dark .text-amber-600 { color: #f59e0b; }
+.dark .text-red-900 { color: #fca5a5; }
+.dark .text-red-700 { color: #f87171; }
+.dark .text-red-600 { color: #f87171; }
+.dark .text-blue-900 { color: #93c5fd; }
+.dark .text-blue-700 { color: #60a5fa; }
+.dark .text-violet-900 { color: #c4b5fd; }
+.dark .text-violet-700 { color: #a78bfa; }
+.dark .text-orange-700 { color: #fb923c; }
+.dark .text-green-700 { color: #4ade80; }
+.dark .text-green-900 { color: #86efac; }
+
+/* --- Borders: light borders → dark borders --- */
+.dark .border-slate-100 { border-color: #1e293b; }
+.dark .border-slate-200 { border-color: #334155; }
+.dark .border-slate-300 { border-color: #475569; }
+.dark .border-emerald-100 { border-color: rgba(16, 185, 129, 0.25); }
+.dark .border-emerald-200 { border-color: rgba(16, 185, 129, 0.3); }
+.dark .border-amber-200 { border-color: rgba(245, 158, 11, 0.3); }
+.dark .border-blue-200 { border-color: rgba(59, 130, 246, 0.3); }
+.dark .border-copper-200 { border-color: rgba(184, 115, 51, 0.3); }
+.dark .border-violet-200 { border-color: rgba(139, 92, 246, 0.3); }
+.dark .border-red-200 { border-color: rgba(239, 68, 68, 0.3); }
+.dark .border-green-200 { border-color: rgba(34, 197, 94, 0.3); }
+.dark .border-orange-200 { border-color: rgba(249, 115, 22, 0.3); }
+
+/* --- Dividers --- */
+.dark .divide-y > :not(:first-child) { border-color: #1e293b; }
+.dark .divide-slate-50 > :not(:first-child) { border-color: #1e293b; }
+
+/* --- Ring/outline on avatars --- */
+.dark .ring-white { --tw-ring-color: #1e293b; }
+
+/* --- Hover states --- */
+.dark .hover\:bg-slate-50:hover { background-color: #1e293b; }
+.dark .hover\:bg-slate-100:hover { background-color: #334155; }
+.dark .hover\:bg-white:hover { background-color: #1e293b; }
+
+/* --- Selection in dark mode --- */
+.dark ::selection {
+  background-color: hsl(262 83% 58% / 0.3);
+  color: #c4b5fd;
+}
+
+/* --- Gray colors (used in status badges/roles) --- */
+.dark .bg-gray-100 { background-color: #374151; }
+.dark .bg-gray-50 { background-color: #1f2937; }
+.dark .text-gray-600 { color: #d1d5db; }
+.dark .text-gray-700 { color: #e5e7eb; }
+.dark .text-gray-900 { color: #f9fafb; }
+.dark .border-gray-200 { border-color: #4b5563; }
+
+/* --- Navy tint backgrounds --- */
+.dark .bg-navy-100 { background-color: rgba(59, 98, 158, 0.15); }
+
+/* --- Copper text in dark mode --- */
+.dark .text-copper-600 { color: #edcaa8; }
+.dark .text-copper-700 { color: #e3ae7b; }
+
+/* --- Gradient text fix for dark mode --- */
+.dark .from-emerald-50 { --tw-gradient-from: rgba(16, 185, 129, 0.1); }
+.dark .to-teal-50 { --tw-gradient-to: rgba(20, 184, 166, 0.1); }
+.dark .from-amber-50 { --tw-gradient-from: rgba(245, 158, 11, 0.1); }
+.dark .to-orange-50 { --tw-gradient-to: rgba(249, 115, 22, 0.1); }
+.dark .from-red-50 { --tw-gradient-from: rgba(239, 68, 68, 0.1); }
+.dark .to-red-50 { --tw-gradient-to: rgba(239, 68, 68, 0.1); }
+.dark .from-blue-50 { --tw-gradient-from: rgba(59, 130, 246, 0.1); }
+.dark .to-blue-50 { --tw-gradient-to: rgba(59, 130, 246, 0.1); }
+.dark .from-violet-50 { --tw-gradient-from: rgba(139, 92, 246, 0.1); }
+.dark .to-violet-50 { --tw-gradient-to: rgba(139, 92, 246, 0.1); }
 
 /* Base styles */
 * {

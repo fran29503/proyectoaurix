@@ -134,13 +134,6 @@ export default function ProfilePage() {
     setSaving(false);
   };
 
-  const handleSaveAppearance = async () => {
-    setSaving(true);
-    applyTheme(theme);
-    showMessage(t.messages?.updateSuccess || "Appearance updated successfully");
-    setSaving(false);
-  };
-
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
       showMessage("Passwords do not match", true);
@@ -587,39 +580,25 @@ export default function ProfilePage() {
                       ].map((option) => (
                         <button
                           key={option.value}
-                          onClick={() => setTheme(option.value as typeof theme)}
+                          onClick={() => {
+                            setTheme(option.value as typeof theme);
+                            applyTheme(option.value as typeof theme);
+                          }}
                           className={cn(
                             "p-4 rounded-xl border-2 text-center transition-all",
                             theme === option.value
-                              ? "border-violet-500 bg-violet-50"
-                              : "border-slate-200 hover:border-slate-300"
+                              ? "border-violet-500 bg-violet-50 dark:bg-violet-500/15"
+                              : "border-slate-200 hover:border-slate-300 dark:border-slate-600 dark:hover:border-slate-500"
                           )}
                         >
                           <div className="text-2xl mb-2">{option.icon}</div>
-                          <p className="font-medium text-slate-900">{option.label}</p>
+                          <p className="font-medium">{option.label}</p>
                         </button>
                       ))}
                     </div>
-                    <p className="text-sm text-slate-500">
-                      {t.profile?.themeNote || "Theme will be applied immediately on save"}
+                    <p className="text-sm text-muted-foreground">
+                      {t.profile?.themeNote || "Theme is applied instantly and saved automatically"}
                     </p>
-                  </div>
-
-                  <div className="flex justify-end pt-4 border-t">
-                    <Button
-                      onClick={handleSaveAppearance}
-                      disabled={saving}
-                      className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-xl"
-                    >
-                      {saving ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          {t.common?.saving}
-                        </>
-                      ) : (
-                        t.common?.saveChanges || "Save Changes"
-                      )}
-                    </Button>
                   </div>
                 </CardContent>
               </Card>
