@@ -47,7 +47,7 @@ export function Header() {
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="flex h-16 items-center justify-between border-b border-slate-100 bg-white/80 backdrop-blur-xl px-6"
+      className="flex h-16 items-center justify-between border-b border-slate-100 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-6"
     >
       {/* Search */}
       <div className="flex items-center gap-4">
@@ -62,13 +62,13 @@ export function Header() {
             placeholder={t.common.search}
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setSearchFocused(false)}
-            className="h-10 pl-10 pr-20 bg-slate-50 border-slate-200 rounded-xl focus:bg-white focus:border-violet-300 focus:ring-2 focus:ring-violet-500/10 transition-all duration-200"
+            className="h-10 pl-10 pr-20 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:border-violet-300 focus:ring-2 focus:ring-violet-500/10 transition-all duration-200"
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs text-slate-400">
-            <kbd className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 font-medium">
+            <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-medium">
               <Command className="w-3 h-3 inline" />
             </kbd>
-            <kbd className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 font-medium">K</kbd>
+            <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-medium">K</kbd>
           </div>
         </motion.div>
       </div>
@@ -96,7 +96,7 @@ export function Header() {
                 size="icon"
                 className="relative h-10 w-10 rounded-xl hover:bg-slate-100"
               >
-                <Bell className="h-5 w-5 text-slate-600" />
+                <Bell className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                 <AnimatePresence>
                   {unreadCount > 0 && (
                     <motion.div
@@ -115,7 +115,7 @@ export function Header() {
               </Button>
             </motion.div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80 p-0 rounded-xl shadow-xl border-slate-200 bg-white z-50">
+          <DropdownMenuContent align="end" className="w-80 p-0 rounded-xl shadow-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 z-50">
             <div className="p-4 border-b border-slate-100">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-slate-900">{t.user.notifications}</h3>
@@ -157,7 +157,7 @@ export function Header() {
         </DropdownMenu>
 
         {/* Divider */}
-        <div className="h-8 w-px bg-slate-200 mx-2" />
+        <div className="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-2" />
 
         {/* User menu */}
         <DropdownMenu>
@@ -174,17 +174,17 @@ export function Header() {
                   <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${user?.isActive ? "bg-emerald-500" : "bg-slate-400"}`} />
                 </div>
                 <div className="hidden flex-col items-start lg:flex">
-                  <span className="text-sm font-medium text-slate-900">
+                  <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
                     {userLoading ? "..." : (user?.fullName || "Guest")}
                   </span>
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
                     {user ? getRoleName(user.role) : ""}
                   </span>
                 </div>
               </Button>
             </motion.div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-xl border-slate-200 bg-white z-50">
+          <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 z-50">
             <DropdownMenuLabel className="p-4">
               <div className="flex items-center gap-3">
                 <Avatar className="h-10 w-10">

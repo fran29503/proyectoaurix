@@ -533,7 +533,7 @@ export const en = {
     lightTheme: "Light",
     darkTheme: "Dark",
     systemTheme: "System",
-    themeNote: "Note: Dark theme is coming soon",
+    themeNote: "Theme will be applied immediately on save",
   },
 
   // Audit

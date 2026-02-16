@@ -134,6 +134,17 @@
   --chart-3: 160 84% 39%;
   --chart-4: 43 96% 56%;
   --chart-5: 27 96% 61%;
+
+  /* Invert custom brand colors for readability */
+  --color-navy-950: #C5D1E5;
+  --color-navy-900: #9EB2D1;
+  --color-navy-800: #7793BD;
+  --color-navy-700: #597AAD;
+  --color-slate-50: #0f172a;
+  --color-slate-100: #1e293b;
+  --color-slate-200: #334155;
+  --color-slate-800: #e2e8f0;
+  --color-slate-900: #f1f5f9;
 }
 
 /* Base styles */

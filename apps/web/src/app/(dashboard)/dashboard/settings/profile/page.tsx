@@ -40,12 +40,14 @@ import {
   deleteAvatar,
   type ProfileData,
 } from "@/lib/queries/profile";
+import { useTheme } from "@/components/providers/theme-provider";
 
 type TabType = "personal" | "notifications" | "security" | "appearance";
 
 export default function ProfilePage() {
   const { t, setLanguage, language } = useLanguage();
   const { user: currentUser } = useCurrentUser();
+  const { theme: currentTheme, setTheme: applyTheme } = useTheme();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [activeTab, setActiveTab] = useState<TabType>("personal");
@@ -63,7 +65,7 @@ export default function ProfilePage() {
   const [notificationsEmail, setNotificationsEmail] = useState(true);
   const [notificationsPush, setNotificationsPush] = useState(true);
   const [notificationsSla, setNotificationsSla] = useState(true);
-  const [theme, setTheme] = useState<"light" | "dark" | "system">("system");
+  const [theme, setTheme] = useState<"light" | "dark" | "system">(currentTheme);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -134,13 +136,8 @@ export default function ProfilePage() {
 
   const handleSaveAppearance = async () => {
     setSaving(true);
-    const { success, error } = await updateProfile({ theme });
-
-    if (success) {
-      showMessage(t.messages?.updateSuccess || "Appearance updated successfully");
-    } else {
-      showMessage(error || t.messages?.updateError || "Failed to update appearance", true);
-    }
+    applyTheme(theme);
+    showMessage(t.messages?.updateSuccess || "Appearance updated successfully");
     setSaving(false);
   };
 
@@ -604,7 +601,7 @@ export default function ProfilePage() {
                       ))}
                     </div>
                     <p className="text-sm text-slate-500">
-                      {t.profile?.themeNote || "Note: Dark theme is coming soon"}
+                      {t.profile?.themeNote || "Theme will be applied immediately on save"}
                     </p>
                   </div>
 

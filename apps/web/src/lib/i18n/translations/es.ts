@@ -527,7 +527,7 @@ export const es: Translations = {
     lightTheme: "Claro",
     darkTheme: "Oscuro",
     systemTheme: "Sistema",
-    themeNote: "Nota: El tema oscuro estará disponible próximamente",
+    themeNote: "El tema se aplicará inmediatamente al guardar",
   },
 
   // Auditoría

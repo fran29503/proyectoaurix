@@ -527,7 +527,7 @@ export const ar: Translations = {
     lightTheme: "فاتح",
     darkTheme: "داكن",
     systemTheme: "النظام",
-    themeNote: "ملاحظة: السمة الداكنة قادمة قريباً",
+    themeNote: "سيتم تطبيق السمة فوراً عند الحفظ",
   },
 
   // سجل المراجعة
