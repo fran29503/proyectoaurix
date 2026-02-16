@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { logAuditAction } from "./audit";
 
 export interface Task {
   id: string;
@@ -117,7 +118,11 @@ export async function getTasksByLead(leadId: string): Promise<Task[]> {
   return data || [];
 }
 
-export async function updateTaskStatus(id: string, status: string): Promise<boolean> {
+export async function updateTaskStatus(
+  id: string,
+  status: string,
+  meta?: { oldStatus?: string; taskName?: string }
+): Promise<boolean> {
   const supabase = createClient();
 
   const updates: Record<string, unknown> = {
@@ -138,6 +143,15 @@ export async function updateTaskStatus(id: string, status: string): Promise<bool
     console.error("Error updating task status:", error);
     return false;
   }
+
+  logAuditAction({
+    action: "update",
+    resource: "task",
+    resourceId: id,
+    resourceName: meta?.taskName,
+    oldValues: meta?.oldStatus ? { status: meta.oldStatus } : undefined,
+    newValues: { status },
+  }).catch(() => {});
 
   return true;
 }

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { logAuditAction } from "./audit";
 import type { Role } from "@/lib/rbac";
 
 export interface User {
@@ -184,6 +185,14 @@ export async function createUser(
     return { user: null, error: "Failed to create user" };
   }
 
+  logAuditAction({
+    action: "create",
+    resource: "user",
+    resourceId: newUser?.id,
+    resourceName: input.full_name,
+    newValues: { email: input.email, role: input.role, team: input.team, market: input.market },
+  }).catch(() => {});
+
   return { user: newUser as User, error: null };
 }
 
@@ -211,6 +220,14 @@ export async function updateUser(
     return { user: null, error: "Failed to update user" };
   }
 
+  logAuditAction({
+    action: "update",
+    resource: "user",
+    resourceId: id,
+    resourceName: updatedUser?.full_name,
+    newValues: input as unknown as Record<string, unknown>,
+  }).catch(() => {});
+
   return { user: updatedUser as User, error: null };
 }
 
@@ -218,7 +235,8 @@ export async function updateUser(
  * Deactivate a user (soft delete)
  */
 export async function deactivateUser(
-  id: string
+  id: string,
+  userName?: string
 ): Promise<{ success: boolean; error: string | null }> {
   const supabase = createClient();
 
@@ -235,6 +253,14 @@ export async function deactivateUser(
     return { success: false, error: "Failed to deactivate user" };
   }
 
+  logAuditAction({
+    action: "deactivate",
+    resource: "user",
+    resourceId: id,
+    resourceName: userName,
+    newValues: { is_active: false },
+  }).catch(() => {});
+
   return { success: true, error: null };
 }
 
@@ -242,7 +268,8 @@ export async function deactivateUser(
  * Reactivate a user
  */
 export async function reactivateUser(
-  id: string
+  id: string,
+  userName?: string
 ): Promise<{ success: boolean; error: string | null }> {
   const supabase = createClient();
 
@@ -258,6 +285,14 @@ export async function reactivateUser(
     console.error("Error reactivating user:", error);
     return { success: false, error: "Failed to reactivate user" };
   }
+
+  logAuditAction({
+    action: "reactivate",
+    resource: "user",
+    resourceId: id,
+    resourceName: userName,
+    newValues: { is_active: true },
+  }).catch(() => {});
 
   return { success: true, error: null };
 }

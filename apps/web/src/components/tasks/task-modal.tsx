@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { createClient } from "@/lib/supabase/client";
+import { logAuditAction } from "@/lib/queries/audit";
 import { Loader2, ClipboardList, Calendar } from "lucide-react";
 import type { Task } from "@/lib/queries/tasks";
 import { useLanguage } from "@/lib/i18n";
@@ -138,6 +139,15 @@ export function TaskModal({ open, onOpenChange, task, defaultLeadId, onSuccess }
           .update(payload)
           .eq("id", task.id);
         if (error) throw error;
+
+        logAuditAction({
+          action: "update",
+          resource: "task",
+          resourceId: task.id,
+          resourceName: payload.title,
+          oldValues: { title: task.title, status: task.status, priority: task.priority },
+          newValues: payload,
+        }).catch(() => {});
       } else {
         // Get tenant_id
         const { data: tenant } = await supabase
@@ -146,10 +156,20 @@ export function TaskModal({ open, onOpenChange, task, defaultLeadId, onSuccess }
           .limit(1)
           .single();
 
-        const { error } = await supabase
+        const { data: newTask, error } = await supabase
           .from("tasks")
-          .insert([{ ...payload, tenant_id: tenant?.id }]);
+          .insert([{ ...payload, tenant_id: tenant?.id }])
+          .select("id")
+          .single();
         if (error) throw error;
+
+        logAuditAction({
+          action: "create",
+          resource: "task",
+          resourceId: newTask?.id,
+          resourceName: payload.title,
+          newValues: payload,
+        }).catch(() => {});
       }
 
       onSuccess?.();

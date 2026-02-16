@@ -12,6 +12,7 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { createClient } from "@/lib/supabase/client";
+import { logAuditAction } from "@/lib/queries/audit";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 
@@ -38,6 +39,13 @@ export function DeleteLeadDialog({ open, onOpenChange, lead, onSuccess }: Delete
       const { error } = await supabase.from("leads").delete().eq("id", lead.id);
 
       if (error) throw error;
+
+      logAuditAction({
+        action: "delete",
+        resource: "lead",
+        resourceId: lead.id,
+        resourceName: lead.full_name,
+      }).catch(() => {});
 
       onSuccess?.();
       onOpenChange(false);

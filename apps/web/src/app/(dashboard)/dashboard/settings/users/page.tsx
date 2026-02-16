@@ -168,7 +168,7 @@ export default function UserManagementPage() {
   };
 
   const handleDeactivateUser = async (user: User) => {
-    const { success, error } = await deactivateUser(user.id);
+    const { success, error } = await deactivateUser(user.id, user.full_name);
     if (success) {
       fetchData();
     } else {
@@ -177,7 +177,7 @@ export default function UserManagementPage() {
   };
 
   const handleReactivateUser = async (user: User) => {
-    const { success, error } = await reactivateUser(user.id);
+    const { success, error } = await reactivateUser(user.id, user.full_name);
     if (success) {
       fetchData();
     } else {

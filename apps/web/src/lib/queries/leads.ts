@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { logAuditAction } from "./audit";
 
 export interface Lead {
   id: string;
@@ -112,7 +113,11 @@ export async function getLeadsByStatus(): Promise<Record<string, Lead[]>> {
   return grouped;
 }
 
-export async function updateLeadStatus(id: string, status: string): Promise<boolean> {
+export async function updateLeadStatus(
+  id: string,
+  status: string,
+  meta?: { oldStatus?: string; leadName?: string }
+): Promise<boolean> {
   const supabase = createClient();
 
   const { error } = await supabase
@@ -124,6 +129,15 @@ export async function updateLeadStatus(id: string, status: string): Promise<bool
     console.error("Error updating lead status:", error);
     return false;
   }
+
+  logAuditAction({
+    action: "update",
+    resource: "lead",
+    resourceId: id,
+    resourceName: meta?.leadName,
+    oldValues: meta?.oldStatus ? { status: meta.oldStatus } : undefined,
+    newValues: { status },
+  }).catch(() => {});
 
   return true;
 }

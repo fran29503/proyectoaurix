@@ -3,7 +3,7 @@
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { motion } from "framer-motion";
 
-const data = [
+const defaultData = [
   { name: "Meta Ads", value: 647, color: "#8b5cf6" },
   { name: "Portals", value: 555, color: "#10b981" },
   { name: "Google Ads", value: 277, color: "#f59e0b" },
@@ -12,7 +12,12 @@ const data = [
   { name: "Referral", value: 72, color: "#ec4899" },
 ];
 
-export function ChannelPieChart() {
+interface ChannelPieChartProps {
+  data?: { name: string; value: number; color: string }[];
+}
+
+export function ChannelPieChart({ data: propData }: ChannelPieChartProps = {}) {
+  const data = propData && propData.length > 0 ? propData : defaultData;
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
   return (

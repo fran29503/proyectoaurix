@@ -242,7 +242,10 @@ export default function LeadDetailPage() {
 
   const handleToggleTask = async (task: Task) => {
     const newStatus = task.status === "completed" ? "pending" : "completed";
-    const success = await updateTaskStatus(task.id, newStatus);
+    const success = await updateTaskStatus(task.id, newStatus, {
+      oldStatus: task.status,
+      taskName: task.title,
+    });
     if (success) {
       fetchData();
     }

@@ -463,7 +463,11 @@ export function KanbanBoard({ leads: initialLeads, onLeadUpdate }: KanbanBoardPr
 
       // Update in Supabase
       try {
-        const success = await updateLeadStatus(activeLeadId, newStatus);
+        const activeLead = leads.find((l) => l.id === activeLeadId);
+        const success = await updateLeadStatus(activeLeadId, newStatus, {
+          oldStatus,
+          leadName: activeLead?.fullName,
+        });
         if (!success) {
           console.error("Failed to update lead status in database, reverting...");
           // Revert the local state change

@@ -9,7 +9,7 @@ import {
   YAxis,
 } from "recharts";
 
-const data = [
+const defaultData = [
   { name: "Jan", dubai: 145, usa: 45 },
   { name: "Feb", dubai: 168, usa: 52 },
   { name: "Mar", dubai: 189, usa: 68 },
@@ -24,7 +24,12 @@ const data = [
   { name: "Dec", dubai: 324, usa: 135 },
 ];
 
-export function LeadTrendChart() {
+interface LeadTrendChartProps {
+  data?: { name: string; dubai: number; usa: number }[];
+}
+
+export function LeadTrendChart({ data: propData }: LeadTrendChartProps = {}) {
+  const data = propData && propData.length > 0 ? propData : defaultData;
   return (
     <ResponsiveContainer width="100%" height={280}>
       <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>

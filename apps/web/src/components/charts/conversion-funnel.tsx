@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
-interface FunnelStage {
+export interface FunnelStage {
   name: string;
   value: number;
   percentage: number;
@@ -11,7 +11,7 @@ interface FunnelStage {
   gradient: string;
 }
 
-const funnelData: FunnelStage[] = [
+const defaultFunnelData: FunnelStage[] = [
   { name: "Leads", value: 1847, percentage: 100, color: "bg-slate-500", gradient: "from-slate-400 to-slate-600" },
   { name: "Contacted", value: 1478, percentage: 80, color: "bg-blue-500", gradient: "from-blue-400 to-blue-600" },
   { name: "Qualified", value: 739, percentage: 40, color: "bg-cyan-500", gradient: "from-cyan-400 to-cyan-600" },
@@ -21,7 +21,13 @@ const funnelData: FunnelStage[] = [
   { name: "Closed Won", value: 37, percentage: 2, color: "bg-emerald-500", gradient: "from-emerald-400 to-emerald-600" },
 ];
 
-export function ConversionFunnel() {
+interface ConversionFunnelProps {
+  data?: FunnelStage[];
+  overallConversionRate?: string;
+}
+
+export function ConversionFunnel({ data: propData, overallConversionRate }: ConversionFunnelProps = {}) {
+  const funnelData = propData && propData.length > 0 ? propData : defaultFunnelData;
   return (
     <div className="space-y-3">
       {funnelData.map((stage, index) => {
@@ -85,7 +91,7 @@ export function ConversionFunnel() {
       >
         <div className="flex justify-between items-center p-3 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100">
           <span className="text-sm font-medium text-slate-700">Overall Conversion</span>
-          <span className="text-lg font-bold text-emerald-600">2.0%</span>
+          <span className="text-lg font-bold text-emerald-600">{overallConversionRate || "2.0%"}</span>
         </div>
         <div className="flex justify-between items-center mt-2 p-3 rounded-xl bg-slate-50">
           <span className="text-sm text-slate-600">Avg. Time to Close</span>

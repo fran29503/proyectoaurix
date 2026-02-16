@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { createClient } from "@/lib/supabase/client";
+import { logAuditAction } from "@/lib/queries/audit";
 import { Loader2, Building2, MapPin, DollarSign, Home } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 
@@ -189,6 +190,15 @@ export function PropertyModal({ open, onOpenChange, property, onSuccess }: Prope
           .update(payload)
           .eq("id", property.id);
         if (error) throw error;
+
+        logAuditAction({
+          action: "update",
+          resource: "property",
+          resourceId: property.id,
+          resourceName: payload.title,
+          oldValues: { title: property.title, price: property.price, status: property.status },
+          newValues: payload,
+        }).catch(() => {});
       } else {
         // Get tenant_id (for now use the default one)
         const { data: tenant } = await supabase
@@ -197,10 +207,20 @@ export function PropertyModal({ open, onOpenChange, property, onSuccess }: Prope
           .limit(1)
           .single();
 
-        const { error } = await supabase
+        const { data: newProperty, error } = await supabase
           .from("properties")
-          .insert([{ ...payload, tenant_id: tenant?.id }]);
+          .insert([{ ...payload, tenant_id: tenant?.id }])
+          .select("id")
+          .single();
         if (error) throw error;
+
+        logAuditAction({
+          action: "create",
+          resource: "property",
+          resourceId: newProperty?.id,
+          resourceName: payload.title,
+          newValues: payload,
+        }).catch(() => {});
       }
 
       onSuccess?.();

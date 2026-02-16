@@ -290,11 +290,66 @@ export const en = {
   // Reports
   reports: {
     title: "Reports",
+    subtitle: "Analytics & performance metrics",
     salesReport: "Sales Report",
     leadsReport: "Leads Report",
     agentPerformance: "Agent Performance",
     dateRange: "Date Range",
     generateReport: "Generate Report",
+    // Tabs
+    overview: "Overview",
+    channels: "Channels",
+    // KPI Cards
+    totalLeads: "Total Leads",
+    totalClosings: "Total Closings",
+    conversionRate: "Conversion Rate",
+    avgBudget: "Avg Budget",
+    vsPreviousPeriod: "vs previous period",
+    // Tables
+    monthlyPerformance: "Monthly Performance",
+    periodBreakdown: "Period breakdown",
+    agentLeaderboard: "Agent Leaderboard",
+    performanceRanking: "Performance ranking",
+    channelPerformance: "Channel Performance",
+    channelEffectiveness: "Lead source effectiveness",
+    propertyTypePerformance: "Property Type Performance",
+    propertyBreakdown: "Breakdown by property type",
+    // Table headers
+    month: "Month",
+    rank: "Rank",
+    agent: "Agent",
+    leads: "Leads",
+    closings: "Closings",
+    convRate: "Conv. Rate",
+    channel: "Channel",
+    type: "Type",
+    total: "Total",
+    available: "Available",
+    reserved: "Reserved",
+    sold: "Sold",
+    avgPrice: "Avg Price",
+    // Properties summary
+    activeListings: "Active Listings",
+    avgListingPrice: "Avg Listing Price",
+    highest: "Highest",
+    lowest: "Lowest",
+    median: "Median",
+    byOperation: "By Operation",
+    // Channels insights
+    leadDistribution: "Lead Distribution",
+    bySourceChannel: "By source channel",
+    channelInsights: "Channel Insights",
+    keyTakeaways: "Key takeaways",
+    topPerformer: "Top Performer",
+    topPerformerDesc: "has the highest conversion rate",
+    mostVolume: "Most Volume",
+    mostVolumeDesc: "generates the most leads",
+    // States
+    noDataForPeriod: "No data for the selected period",
+    loadingReports: "Loading reports...",
+    // Time
+    thisQuarter: "This Quarter",
+    thisYear: "This Year",
   },
 
   // User menu

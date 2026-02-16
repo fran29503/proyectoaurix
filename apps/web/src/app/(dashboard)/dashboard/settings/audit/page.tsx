@@ -326,7 +326,8 @@ export default function AuditLogPage() {
             <SelectItem value="update">Update</SelectItem>
             <SelectItem value="delete">Delete</SelectItem>
             <SelectItem value="assign">Assign</SelectItem>
-            <SelectItem value="invite">Invite</SelectItem>
+            <SelectItem value="deactivate">Deactivate</SelectItem>
+            <SelectItem value="reactivate">Reactivate</SelectItem>
           </SelectContent>
         </Select>
         <Select

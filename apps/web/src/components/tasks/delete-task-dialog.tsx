@@ -12,6 +12,7 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { createClient } from "@/lib/supabase/client";
+import { logAuditAction } from "@/lib/queries/audit";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 
@@ -37,6 +38,13 @@ export function DeleteTaskDialog({ open, onOpenChange, task, onSuccess }: Delete
       const supabase = createClient();
       const { error } = await supabase.from("tasks").delete().eq("id", task.id);
       if (error) throw error;
+
+      logAuditAction({
+        action: "delete",
+        resource: "task",
+        resourceId: task.id,
+        resourceName: task.title,
+      }).catch(() => {});
 
       onSuccess?.();
       onOpenChange(false);

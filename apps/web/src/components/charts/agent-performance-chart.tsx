@@ -9,7 +9,7 @@ import {
   YAxis,
 } from "recharts";
 
-const data = [
+const defaultData = [
   { name: "Youssef N.", leads: 45, closings: 5, sla: 94 },
   { name: "Lina P.", leads: 52, closings: 7, sla: 98 },
   { name: "Aisha R.", leads: 38, closings: 4, sla: 95 },
@@ -18,7 +18,12 @@ const data = [
   { name: "Sofía D.", leads: 22, closings: 2, sla: 88 },
 ];
 
-export function AgentPerformanceChart() {
+interface AgentPerformanceChartProps {
+  data?: { name: string; leads: number; closings: number }[];
+}
+
+export function AgentPerformanceChart({ data: propData }: AgentPerformanceChartProps = {}) {
+  const data = propData && propData.length > 0 ? propData : defaultData;
   return (
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>

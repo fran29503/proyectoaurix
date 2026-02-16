@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/client";
+import { logAuditAction } from "@/lib/queries/audit";
 import { Loader2, UserPlus, Check, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { getInitials } from "@/lib/utils";
@@ -80,6 +81,16 @@ export function AssignLeadDialog({ open, onOpenChange, lead, onSuccess }: Assign
         .eq("id", lead.id);
 
       if (error) throw error;
+
+      const assignedUser = users.find((u) => u.id === userId);
+      logAuditAction({
+        action: "assign",
+        resource: "lead",
+        resourceId: lead.id,
+        resourceName: lead.full_name,
+        oldValues: { assigned_to: lead.assigned_to },
+        newValues: { assigned_to: userId, assigned_user_name: assignedUser?.full_name || null },
+      }).catch(() => {});
 
       onSuccess?.();
       onOpenChange(false);

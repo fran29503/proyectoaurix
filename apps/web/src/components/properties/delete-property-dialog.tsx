@@ -12,6 +12,7 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { createClient } from "@/lib/supabase/client";
+import { logAuditAction } from "@/lib/queries/audit";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 
@@ -37,6 +38,13 @@ export function DeletePropertyDialog({ open, onOpenChange, property, onSuccess }
       const supabase = createClient();
       const { error } = await supabase.from("properties").delete().eq("id", property.id);
       if (error) throw error;
+
+      logAuditAction({
+        action: "delete",
+        resource: "property",
+        resourceId: property.id,
+        resourceName: property.title,
+      }).catch(() => {});
 
       onSuccess?.();
       onOpenChange(false);

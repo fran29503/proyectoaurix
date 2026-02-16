@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createClient } from "@/lib/supabase/client";
+import { logAuditAction } from "@/lib/queries/audit";
 import { X, Loader2, User, Phone, Mail, Globe, DollarSign, MapPin } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 
@@ -156,6 +157,15 @@ export function LeadModal({ open, onOpenChange, lead, onSuccess }: LeadModalProp
           .eq("id", lead.id);
 
         if (error) throw error;
+
+        logAuditAction({
+          action: "update",
+          resource: "lead",
+          resourceId: lead.id,
+          resourceName: payload.full_name,
+          oldValues: { full_name: lead.full_name, status: lead.status, market: lead.market },
+          newValues: payload,
+        }).catch(() => {});
       } else {
         // Get tenant_id for new leads
         const { data: tenant, error: tenantError } = await supabase
@@ -174,16 +184,24 @@ export function LeadModal({ open, onOpenChange, lead, onSuccess }: LeadModalProp
           throw new Error("No tenant found. Please contact support.");
         }
 
-        console.log("Creating lead with tenant_id:", tenant.id);
-
-        const { error } = await supabase
+        const { data: newLead, error } = await supabase
           .from("leads")
-          .insert([{ ...payload, status: "nuevo", tenant_id: tenant.id }]);
+          .insert([{ ...payload, status: "nuevo", tenant_id: tenant.id }])
+          .select("id")
+          .single();
 
         if (error) {
           console.error("Supabase insert error:", error.message, error.details, error.hint, error.code);
           throw error;
         }
+
+        logAuditAction({
+          action: "create",
+          resource: "lead",
+          resourceId: newLead?.id,
+          resourceName: payload.full_name,
+          newValues: { ...payload, status: "nuevo" },
+        }).catch(() => {});
       }
 
       onSuccess?.();
