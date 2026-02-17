@@ -226,19 +226,11 @@ export async function getSLAAlerts(): Promise<SLAAlert[]> {
     if (diffMins > 30) severity = "high";
     else if (diffMins > 15) severity = "medium";
 
-    // Format as HH:MM:SS
-    const totalSeconds = Math.floor(diffMs / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-    const pad = (n: number) => n.toString().padStart(2, "0");
-    const timeFormatted = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-
     return {
       id: lead.id,
       leadName: lead.full_name,
       market: lead.market === "dubai" ? "Dubai" : "USA",
-      time: timeFormatted,
+      time: created.toISOString(),
       assignee: lead.assigned_to ? assigneeMap[lead.assigned_to] || "Unknown" : "Unassigned",
       severity,
       createdAt: created,

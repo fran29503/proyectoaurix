@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -37,6 +37,42 @@ import {
   type SLAAlert,
   type TopAgent,
 } from "@/lib/queries/dashboard";
+
+// --- Live Timer Component ---
+function formatElapsed(ms: number): string {
+  if (ms < 0) ms = 0;
+  const totalSeconds = Math.floor(ms / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (days >= 1) {
+    return `${days}d ${hours}h`;
+  }
+  if (hours >= 1) {
+    return `${hours}h ${minutes}m`;
+  }
+  return `${minutes}m ${seconds}s`;
+}
+
+function LiveTimer({ since }: { since: string }) {
+  const [elapsed, setElapsed] = useState(() => Date.now() - new Date(since).getTime());
+
+  useEffect(() => {
+    const origin = new Date(since).getTime();
+    const tick = () => setElapsed(Date.now() - origin);
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [since]);
+
+  return (
+    <span className="tabular-nums font-mono text-xs font-semibold">
+      {formatElapsed(elapsed)}
+    </span>
+  );
+}
 
 interface KPIData {
   id: string;
@@ -594,13 +630,15 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <Badge
-                      className={
+                      className={`flex items-center gap-1.5 ${
                         alert.severity === "high"
                           ? "bg-red-100 text-red-700 border-red-200"
                           : "bg-amber-100 text-amber-700 border-amber-200"
-                      }
+                      }`}
                     >
-                      {alert.time} {t.dashboard.waiting}
+                      <Clock className="h-3 w-3" />
+                      <LiveTimer since={alert.time} />
+                      {t.dashboard.waiting}
                     </Badge>
                     <Link href={`/dashboard/leads/${alert.id}`}>
                       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
