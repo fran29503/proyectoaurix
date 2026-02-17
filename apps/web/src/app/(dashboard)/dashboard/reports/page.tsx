@@ -193,7 +193,7 @@ export default function ReportsPage() {
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder={t.market.all} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-lg z-50">
               <SelectItem value="all">{t.market.all}</SelectItem>
               <SelectItem value="dubai">{t.market.dubai}</SelectItem>
               <SelectItem value="usa">{t.market.usa}</SelectItem>
@@ -203,7 +203,7 @@ export default function ReportsPage() {
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder={t.reports.dateRange} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-lg z-50">
               <SelectItem value="month">{t.time.thisMonth}</SelectItem>
               <SelectItem value="quarter">{t.reports.thisQuarter}</SelectItem>
               <SelectItem value="year">{t.reports.thisYear}</SelectItem>

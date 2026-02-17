@@ -57,11 +57,11 @@ function KPICard({ kpi, index }: { kpi: KPIData; index: number }) {
   return (
     <StaggerItem>
       <HoverLift>
-        <Card className={`relative overflow-hidden border-0 shadow-lg ${kpi.shadowColor} transition-shadow duration-300 hover:shadow-xl`}>
+        <Card className={`relative overflow-hidden border-0 shadow-lg ${kpi.shadowColor} transition-shadow duration-300 hover:shadow-xl h-full`}>
           {/* Gradient accent */}
           <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${kpi.gradient}`} />
 
-          <CardContent className="p-6">
+          <CardContent className="p-6 flex flex-col justify-between h-full min-h-[160px]">
             <div className="flex items-center justify-between mb-4">
               <motion.div
                 whileHover={{ scale: 1.1, rotate: 5 }}
@@ -72,7 +72,7 @@ function KPICard({ kpi, index }: { kpi: KPIData; index: number }) {
               </motion.div>
               <div className={`flex items-center gap-1 text-sm font-medium ${isUp ? "text-emerald-600" : "text-slate-400"}`}>
                 {isUp && <ArrowUpRight className="h-4 w-4" />}
-                {kpi.change}
+                {kpi.change || "\u00A0"}
               </div>
             </div>
             <motion.div
@@ -82,7 +82,7 @@ function KPICard({ kpi, index }: { kpi: KPIData; index: number }) {
             >
               <h3 className="text-3xl font-bold text-slate-900">{kpi.value}</h3>
               <p className="text-sm font-medium text-slate-600 mt-1">{kpi.title}</p>
-              <p className="text-xs text-slate-400 mt-0.5">{kpi.description}</p>
+              <p className="text-xs text-slate-400 mt-0.5">{kpi.description || "\u00A0"}</p>
             </motion.div>
           </CardContent>
         </Card>

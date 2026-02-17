@@ -74,7 +74,7 @@ export function ConversionFunnel({ data: propData, overallConversionRate }: Conv
                   transition={{ delay: 0.5 + index * 0.05 }}
                   className="absolute right-0 flex items-center gap-1 text-xs text-slate-400"
                 >
-                  <span className="bg-white/90 px-2 py-0.5 rounded-full shadow-sm border border-slate-100">
+                  <span className="bg-white/90 dark:bg-slate-800/90 px-2 py-0.5 rounded-full shadow-sm border border-slate-100 dark:border-slate-700">
                     → {conversionRate}%
                   </span>
                 </motion.div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { motion } from "framer-motion";
 
@@ -12,6 +13,18 @@ const defaultData = [
   { name: "Referral", value: 72, color: "#ec4899" },
 ];
 
+function useIsDark() {
+  const [dark, setDark] = useState(false);
+  useEffect(() => {
+    const el = document.documentElement;
+    setDark(el.classList.contains("dark"));
+    const obs = new MutationObserver(() => setDark(el.classList.contains("dark")));
+    obs.observe(el, { attributes: true, attributeFilter: ["class"] });
+    return () => obs.disconnect();
+  }, []);
+  return dark;
+}
+
 interface ChannelPieChartProps {
   data?: { name: string; value: number; color: string }[];
 }
@@ -19,6 +32,19 @@ interface ChannelPieChartProps {
 export function ChannelPieChart({ data: propData }: ChannelPieChartProps = {}) {
   const data = propData && propData.length > 0 ? propData : defaultData;
   const total = data.reduce((sum, item) => sum + item.value, 0);
+  const isDark = useIsDark();
+
+  const tooltipStyle = {
+    backgroundColor: isDark ? "#1e293b" : "white",
+    color: isDark ? "#f1f5f9" : undefined,
+    border: "none",
+    borderRadius: "12px",
+    boxShadow: isDark
+      ? "0 10px 40px -10px rgba(0,0,0,0.5)"
+      : "0 10px 40px -10px rgba(0,0,0,0.2)",
+    fontSize: "12px",
+    padding: "12px 16px",
+  };
 
   return (
     <div className="flex items-center gap-6">
@@ -39,14 +65,8 @@ export function ChannelPieChart({ data: propData }: ChannelPieChartProps = {}) {
             ))}
           </Pie>
           <Tooltip
-            contentStyle={{
-              backgroundColor: "white",
-              border: "none",
-              borderRadius: "12px",
-              boxShadow: "0 10px 40px -10px rgba(0,0,0,0.2)",
-              fontSize: "12px",
-              padding: "12px 16px",
-            }}
+            contentStyle={tooltipStyle}
+            itemStyle={{ color: isDark ? "#cbd5e1" : undefined }}
             formatter={(value) => [
               `${Number(value).toLocaleString()} leads`,
               "",
