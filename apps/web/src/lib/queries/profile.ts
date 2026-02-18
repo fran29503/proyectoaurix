@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { logAuditAction } from "@/lib/queries/audit";
 
 export interface ProfileData {
   id: string;
@@ -91,6 +92,13 @@ export async function updateProfile(
     return { success: false, error: "Failed to update profile" };
   }
 
+  logAuditAction({
+    action: "update",
+    resource: "settings",
+    resourceName: "Profile",
+    newValues: dbFields,
+  }).catch(() => {});
+
   return { success: true, error: null };
 }
 
@@ -110,6 +118,12 @@ export async function updatePassword(
     console.error("Error updating password:", error);
     return { success: false, error: error.message };
   }
+
+  logAuditAction({
+    action: "update",
+    resource: "settings",
+    resourceName: "Password",
+  }).catch(() => {});
 
   return { success: true, error: null };
 }
@@ -156,6 +170,13 @@ export async function uploadAvatar(
   // Update user profile with new avatar URL
   await updateProfile({ avatar_url: publicUrl });
 
+  logAuditAction({
+    action: "update",
+    resource: "settings",
+    resourceName: "Avatar",
+    newValues: { avatar_url: publicUrl },
+  }).catch(() => {});
+
   return { url: publicUrl, error: null };
 }
 
@@ -191,6 +212,12 @@ export async function deleteAvatar(): Promise<{ success: boolean; error: string 
 
   // Update profile to remove avatar URL
   await updateProfile({ avatar_url: null });
+
+  logAuditAction({
+    action: "delete",
+    resource: "settings",
+    resourceName: "Avatar",
+  }).catch(() => {});
 
   return { success: true, error: null };
 }

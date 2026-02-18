@@ -14,6 +14,7 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { logAuditAction } from "@/lib/queries/audit";
 import { Loader2, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
 import { useLanguage } from "@/lib/i18n";
 
 interface DeleteTaskDialogProps {
@@ -46,10 +47,12 @@ export function DeleteTaskDialog({ open, onOpenChange, task, onSuccess }: Delete
         resourceName: task.title,
       }).catch(() => {});
 
+      toast.success(t.messages.deleteSuccess);
       onSuccess?.();
       onOpenChange(false);
     } catch (err) {
       console.error("Error deleting task:", err);
+      toast.error(t.messages.deleteError);
     } finally {
       setLoading(false);
     }

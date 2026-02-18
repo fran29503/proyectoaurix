@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { createClient } from "@/lib/supabase/client";
 import { logAuditAction } from "@/lib/queries/audit";
 import { Loader2, ClipboardList, Calendar } from "lucide-react";
+import { toast } from "sonner";
 import type { Task } from "@/lib/queries/tasks";
 import { useLanguage } from "@/lib/i18n";
 
@@ -172,11 +173,13 @@ export function TaskModal({ open, onOpenChange, task, defaultLeadId, onSuccess }
         }).catch(() => {});
       }
 
+      toast.success(isEditing ? t.messages.updateSuccess : t.messages.createSuccess);
       onSuccess?.();
       onOpenChange(false);
     } catch (err) {
       console.error("Error saving task:", err);
       setError(err instanceof Error ? err.message : "Failed to save task");
+      toast.error(isEditing ? t.messages.updateError : t.messages.createError);
     } finally {
       setLoading(false);
     }

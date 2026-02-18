@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { createClient } from "@/lib/supabase/client";
 import { logAuditAction } from "@/lib/queries/audit";
 import { Loader2, Building2, MapPin, DollarSign, Home } from "lucide-react";
+import { toast } from "sonner";
 import { useLanguage } from "@/lib/i18n";
 
 interface PropertyModalProps {
@@ -223,11 +224,13 @@ export function PropertyModal({ open, onOpenChange, property, onSuccess }: Prope
         }).catch(() => {});
       }
 
+      toast.success(isEditing ? t.messages.updateSuccess : t.messages.createSuccess);
       onSuccess?.();
       onOpenChange(false);
     } catch (err) {
       console.error("Error saving property:", err);
       setError(err instanceof Error ? err.message : "Failed to save property");
+      toast.error(isEditing ? t.messages.updateError : t.messages.createError);
     } finally {
       setLoading(false);
     }

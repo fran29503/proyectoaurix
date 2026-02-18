@@ -483,6 +483,8 @@ export const ar: Translations = {
     invalidPhone: "رقم هاتف غير صالح",
     minLength: "الحد الأدنى {min} أحرف",
     maxLength: "الحد الأقصى {max} أحرف",
+    passwordMismatch: "كلمات المرور غير متطابقة",
+    passwordLength: "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
   },
 
   // الرسائل
@@ -499,6 +501,11 @@ export const ar: Translations = {
     loadTeamError: "فشل في تحميل أعضاء الفريق",
     loadLeadsError: "فشل في تحميل العملاء",
     loadPropertiesError: "فشل في تحميل العقارات",
+    assignSuccess: "تم التعيين بنجاح",
+    assignError: "خطأ في التعيين",
+    passwordUpdated: "تم تحديث كلمة المرور بنجاح",
+    passwordError: "خطأ في تحديث كلمة المرور",
+    profileUpdated: "تم تحديث الملف الشخصي بنجاح",
   },
 
   // الملف الشخصي

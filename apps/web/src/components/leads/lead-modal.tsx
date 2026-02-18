@@ -21,6 +21,7 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { logAuditAction } from "@/lib/queries/audit";
 import { X, Loader2, User, Phone, Mail, Globe, DollarSign, MapPin } from "lucide-react";
+import { toast } from "sonner";
 import { useLanguage } from "@/lib/i18n";
 
 interface LeadModalProps {
@@ -204,6 +205,7 @@ export function LeadModal({ open, onOpenChange, lead, onSuccess }: LeadModalProp
         }).catch(() => {});
       }
 
+      toast.success(isEditing ? t.messages.updateSuccess : t.messages.createSuccess);
       onSuccess?.();
       onOpenChange(false);
     } catch (err: unknown) {
@@ -219,6 +221,7 @@ export function LeadModal({ open, onOpenChange, lead, onSuccess }: LeadModalProp
         console.error("Error saving lead (unknown):", JSON.stringify(err));
         setError("Failed to save lead");
       }
+      toast.error(isEditing ? t.messages.updateError : t.messages.createError);
     } finally {
       setLoading(false);
     }

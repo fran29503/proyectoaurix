@@ -14,6 +14,7 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { logAuditAction } from "@/lib/queries/audit";
 import { Loader2, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
 import { useLanguage } from "@/lib/i18n";
 
 interface DeleteLeadDialogProps {
@@ -47,10 +48,12 @@ export function DeleteLeadDialog({ open, onOpenChange, lead, onSuccess }: Delete
         resourceName: lead.full_name,
       }).catch(() => {});
 
+      toast.success(t.messages.deleteSuccess);
       onSuccess?.();
       onOpenChange(false);
     } catch (err) {
       console.error("Error deleting lead:", err);
+      toast.error(t.messages.deleteError);
     } finally {
       setLoading(false);
     }

@@ -36,6 +36,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import { useLanguage } from "@/lib/i18n";
 import {
   useCurrentUser,
@@ -267,11 +268,13 @@ export function UserModal({
         }
       }
 
+      toast.success(isEditing ? t.settings.userUpdated : t.settings.userCreated);
       onSuccess();
       onOpenChange(false);
     } catch (err) {
       console.error("Error saving user:", err);
       setError(t.common?.error || "An error occurred");
+      toast.error(isEditing ? t.messages.updateError : t.messages.createError);
     } finally {
       setLoading(false);
     }

@@ -14,6 +14,7 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { logAuditAction } from "@/lib/queries/audit";
 import { Loader2, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
 import { useLanguage } from "@/lib/i18n";
 
 interface DeletePropertyDialogProps {
@@ -46,10 +47,12 @@ export function DeletePropertyDialog({ open, onOpenChange, property, onSuccess }
         resourceName: property.title,
       }).catch(() => {});
 
+      toast.success(t.messages.deleteSuccess);
       onSuccess?.();
       onOpenChange(false);
     } catch (err) {
       console.error("Error deleting property:", err);
+      toast.error(t.messages.deleteError);
     } finally {
       setLoading(false);
     }

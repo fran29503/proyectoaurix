@@ -483,6 +483,8 @@ export const es: Translations = {
     invalidPhone: "Número de teléfono inválido",
     minLength: "Mínimo {min} caracteres",
     maxLength: "Máximo {max} caracteres",
+    passwordMismatch: "Las contraseñas no coinciden",
+    passwordLength: "La contraseña debe tener al menos 8 caracteres",
   },
 
   // Mensajes
@@ -499,6 +501,11 @@ export const es: Translations = {
     loadTeamError: "Error al cargar miembros del equipo",
     loadLeadsError: "Error al cargar leads",
     loadPropertiesError: "Error al cargar propiedades",
+    assignSuccess: "Asignado exitosamente",
+    assignError: "Error al asignar",
+    passwordUpdated: "Contraseña actualizada exitosamente",
+    passwordError: "Error al actualizar contraseña",
+    profileUpdated: "Perfil actualizado exitosamente",
   },
 
   // Perfil

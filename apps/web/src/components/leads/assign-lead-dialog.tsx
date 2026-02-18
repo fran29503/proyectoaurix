@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/client";
 import { logAuditAction } from "@/lib/queries/audit";
 import { Loader2, UserPlus, Check, Search } from "lucide-react";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { getInitials } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -92,10 +93,12 @@ export function AssignLeadDialog({ open, onOpenChange, lead, onSuccess }: Assign
         newValues: { assigned_to: userId, assigned_user_name: assignedUser?.full_name || null },
       }).catch(() => {});
 
+      toast.success(t.messages.assignSuccess);
       onSuccess?.();
       onOpenChange(false);
     } catch (err) {
       console.error("Error assigning lead:", err);
+      toast.error(t.messages.assignError);
     } finally {
       setAssigning(null);
     }

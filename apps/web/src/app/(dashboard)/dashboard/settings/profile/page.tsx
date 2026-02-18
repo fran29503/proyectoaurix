@@ -23,13 +23,12 @@ import {
   Palette,
   Camera,
   Loader2,
-  Check,
-  AlertCircle,
   Trash2,
 } from "lucide-react";
 import { cn, getInitials } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { FadeIn, HoverLift } from "@/components/ui/motion";
+import { toast } from "sonner";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrentUser } from "@/lib/rbac";
 import {
@@ -55,8 +54,6 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   // Form states
   const [fullName, setFullName] = useState("");
@@ -87,73 +84,59 @@ export default function ProfilePage() {
     loadProfile();
   }, []);
 
-  const showMessage = (msg: string, isError: boolean = false) => {
-    if (isError) {
-      setError(msg);
-      setSuccess(null);
-    } else {
-      setSuccess(msg);
-      setError(null);
-    }
-    setTimeout(() => {
-      setSuccess(null);
-      setError(null);
-    }, 3000);
-  };
-
   const handleSavePersonal = async () => {
     setSaving(true);
-    const { success, error } = await updateProfile({
+    const result = await updateProfile({
       full_name: fullName,
       phone: phone || null,
       language: selectedLanguage,
     });
 
-    if (success) {
+    if (result.success) {
       setLanguage(selectedLanguage as "en" | "es" | "ar");
-      showMessage(t.messages?.updateSuccess || "Profile updated successfully");
+      toast.success(t.messages.profileUpdated);
     } else {
-      showMessage(error || t.messages?.updateError || "Failed to update profile", true);
+      toast.error(result.error || t.messages.updateError);
     }
     setSaving(false);
   };
 
   const handleSaveNotifications = async () => {
     setSaving(true);
-    const { success, error } = await updateProfile({
+    const result = await updateProfile({
       notifications_email: notificationsEmail,
       notifications_push: notificationsPush,
       notifications_sla: notificationsSla,
     });
 
-    if (success) {
-      showMessage(t.messages?.updateSuccess || "Settings updated successfully");
+    if (result.success) {
+      toast.success(t.messages.updateSuccess);
     } else {
-      showMessage(error || t.messages?.updateError || "Failed to update settings", true);
+      toast.error(result.error || t.messages.updateError);
     }
     setSaving(false);
   };
 
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
-      showMessage("Passwords do not match", true);
+      toast.error(t.validation?.passwordMismatch || "Passwords do not match");
       return;
     }
 
     if (newPassword.length < 8) {
-      showMessage("Password must be at least 8 characters", true);
+      toast.error(t.validation?.passwordLength || "Password must be at least 8 characters");
       return;
     }
 
     setSaving(true);
-    const { success, error } = await updatePassword(newPassword);
+    const result = await updatePassword(newPassword);
 
-    if (success) {
-      showMessage("Password updated successfully");
+    if (result.success) {
+      toast.success(t.messages.passwordUpdated);
       setNewPassword("");
       setConfirmPassword("");
     } else {
-      showMessage(error || "Failed to update password", true);
+      toast.error(result.error || t.messages.passwordError);
     }
     setSaving(false);
   };
@@ -166,15 +149,13 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith("image/")) {
-      showMessage("Please select an image file", true);
+      toast.error("Please select an image file");
       return;
     }
 
-    // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
-      showMessage("Image must be less than 2MB", true);
+      toast.error("Image must be less than 2MB");
       return;
     }
 
@@ -183,22 +164,22 @@ export default function ProfilePage() {
 
     if (url) {
       setProfile((prev) => (prev ? { ...prev, avatar_url: url } : null));
-      showMessage("Avatar updated successfully");
+      toast.success(t.messages.updateSuccess);
     } else {
-      showMessage(error || "Failed to upload avatar", true);
+      toast.error(error || t.messages.updateError);
     }
     setUploadingAvatar(false);
   };
 
   const handleDeleteAvatar = async () => {
     setUploadingAvatar(true);
-    const { success, error } = await deleteAvatar();
+    const result = await deleteAvatar();
 
-    if (success) {
+    if (result.success) {
       setProfile((prev) => (prev ? { ...prev, avatar_url: null } : null));
-      showMessage("Avatar removed");
+      toast.success(t.messages.deleteSuccess);
     } else {
-      showMessage(error || "Failed to remove avatar", true);
+      toast.error(result.error || t.messages.deleteError);
     }
     setUploadingAvatar(false);
   };
@@ -245,21 +226,6 @@ export default function ProfilePage() {
           </div>
         </div>
       </FadeIn>
-
-      {/* Success/Error Messages */}
-      {(success || error) && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={cn(
-            "flex items-center gap-2 p-4 rounded-xl",
-            success ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-red-50 text-red-700 border border-red-200"
-          )}
-        >
-          {success ? <Check className="h-5 w-5" /> : <AlertCircle className="h-5 w-5" />}
-          {success || error}
-        </motion.div>
-      )}
 
       <div className="grid gap-6 lg:grid-cols-4">
         {/* Sidebar */}

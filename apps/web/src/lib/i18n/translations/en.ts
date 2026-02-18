@@ -489,6 +489,8 @@ export const en = {
     invalidPhone: "Invalid phone number",
     minLength: "Minimum {min} characters",
     maxLength: "Maximum {max} characters",
+    passwordMismatch: "Passwords do not match",
+    passwordLength: "Password must be at least 8 characters",
   },
 
   // Messages
@@ -505,6 +507,11 @@ export const en = {
     loadTeamError: "Failed to load team members",
     loadLeadsError: "Failed to load leads",
     loadPropertiesError: "Failed to load properties",
+    assignSuccess: "Assigned successfully",
+    assignError: "Error assigning",
+    passwordUpdated: "Password updated successfully",
+    passwordError: "Error updating password",
+    profileUpdated: "Profile updated successfully",
   },
 
   // Profile

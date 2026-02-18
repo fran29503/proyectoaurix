@@ -46,6 +46,7 @@ import {
 import { cn, getInitials } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { FadeIn, HoverLift } from "@/components/ui/motion";
+import { toast } from "sonner";
 import { useLanguage } from "@/lib/i18n";
 import {
   useCurrentUser,
@@ -168,29 +169,35 @@ export default function UserManagementPage() {
   };
 
   const handleDeactivateUser = async (user: User) => {
-    const { success, error } = await deactivateUser(user.id, user.full_name);
-    if (success) {
+    const result = await deactivateUser(user.id, user.full_name);
+    if (result.success) {
+      toast.success(t.messages.updateSuccess);
       fetchData();
     } else {
-      console.error("Failed to deactivate user:", error);
+      console.error("Failed to deactivate user:", result.error);
+      toast.error(result.error || t.messages.updateError);
     }
   };
 
   const handleReactivateUser = async (user: User) => {
-    const { success, error } = await reactivateUser(user.id, user.full_name);
-    if (success) {
+    const result = await reactivateUser(user.id, user.full_name);
+    if (result.success) {
+      toast.success(t.messages.updateSuccess);
       fetchData();
     } else {
-      console.error("Failed to reactivate user:", error);
+      console.error("Failed to reactivate user:", result.error);
+      toast.error(result.error || t.messages.updateError);
     }
   };
 
   const handleResendInvitation = async (user: User) => {
-    const { success, error } = await resendInvitation(user.id);
-    if (success) {
+    const result = await resendInvitation(user.id);
+    if (result.success) {
+      toast.success(t.settings.invitationSent);
       fetchData();
     } else {
-      console.error("Failed to resend invitation:", error);
+      console.error("Failed to resend invitation:", result.error);
+      toast.error(result.error || t.messages.updateError);
     }
   };
 
