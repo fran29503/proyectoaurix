@@ -506,6 +506,8 @@ export const ar: Translations = {
     passwordUpdated: "تم تحديث كلمة المرور بنجاح",
     passwordError: "خطأ في تحديث كلمة المرور",
     profileUpdated: "تم تحديث الملف الشخصي بنجاح",
+    exportSuccess: "تم تصدير البيانات بنجاح",
+    exportError: "فشل في تصدير البيانات",
   },
 
   // الملف الشخصي

@@ -196,6 +196,7 @@ export function Sidebar() {
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      data-sidebar
       className="flex h-full w-64 flex-col bg-slate-900 dark:bg-slate-950"
     >
       {/* Logo - Dynamic based on tenant branding */}

@@ -41,15 +41,19 @@ import {
   Eye,
   Activity,
   Shield,
+  Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { FadeIn, HoverLift } from "@/components/ui/motion";
+import { exportToCsv, getAuditCsvColumns } from "@/lib/export";
+import { toast } from "sonner";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrentUser, AdminOnly } from "@/lib/rbac";
 import {
   getAuditLogs,
   getAuditStats,
+  logAuditAction,
   actionLabels,
   resourceLabels,
   actionColors,
@@ -97,6 +101,7 @@ export default function AuditLogPage() {
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   // Filters & Pagination
   const [page, setPage] = useState(1);
@@ -141,6 +146,31 @@ export default function AuditLogPage() {
   const handleRefresh = () => {
     setRefreshing(true);
     fetchData();
+  };
+
+  const handleExportAudit = async () => {
+    setExporting(true);
+    try {
+      const filters: AuditFilters = {
+        action: actionFilter !== "all" ? actionFilter : undefined,
+        resource: resourceFilter !== "all" ? resourceFilter : undefined,
+        search: search || undefined,
+      };
+      const allData = await getAuditLogs(filters, 1, 10000);
+      const columns = getAuditCsvColumns(t);
+      const dateStr = new Date().toISOString().split("T")[0];
+      exportToCsv(`aurix-audit-${dateStr}.csv`, columns, allData.logs);
+      toast.success(t.messages.exportSuccess);
+      logAuditAction({
+        action: "export",
+        resource: "settings",
+        metadata: { count: allData.logs.length, format: "csv", type: "audit_logs" },
+      }).catch(() => {});
+    } catch {
+      toast.error(t.messages.exportError);
+    } finally {
+      setExporting(false);
+    }
   };
 
   const totalPages = Math.ceil(total / pageSize);
@@ -212,6 +242,20 @@ export default function AuditLogPage() {
                 {t.common?.refresh}
               </Button>
             </motion.div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-xl"
+              onClick={handleExportAudit}
+              disabled={exporting}
+            >
+              {exporting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="mr-2 h-4 w-4" />
+              )}
+              {t.common?.export}
+            </Button>
           </div>
         </div>
       </FadeIn>

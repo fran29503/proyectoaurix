@@ -506,6 +506,8 @@ export const es: Translations = {
     passwordUpdated: "Contraseña actualizada exitosamente",
     passwordError: "Error al actualizar contraseña",
     profileUpdated: "Perfil actualizado exitosamente",
+    exportSuccess: "Datos exportados exitosamente",
+    exportError: "Error al exportar datos",
   },
 
   // Perfil

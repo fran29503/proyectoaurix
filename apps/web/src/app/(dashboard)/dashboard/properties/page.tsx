@@ -14,7 +14,10 @@ import { PropertyCard } from "@/components/properties/property-card";
 import { PropertyModal } from "@/components/properties/property-modal";
 import { DeletePropertyDialog } from "@/components/properties/delete-property-dialog";
 import { getProperties, type Property } from "@/lib/queries/properties";
-import { Plus, Search, LayoutGrid, List, Filter, Loader2, RefreshCw } from "lucide-react";
+import { Plus, Search, LayoutGrid, List, Filter, Loader2, RefreshCw, Download } from "lucide-react";
+import { logAuditAction } from "@/lib/queries/audit";
+import { exportToCsv, getPropertyCsvColumns } from "@/lib/export";
+import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { FadeIn, HoverLift } from "@/components/ui/motion";
 import { useLanguage } from "@/lib/i18n";
@@ -178,6 +181,29 @@ export default function PropertiesPage() {
                 {t.common.refresh}
               </Button>
             </motion.div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-xl"
+              onClick={() => {
+                try {
+                  const columns = getPropertyCsvColumns(t);
+                  const dateStr = new Date().toISOString().split("T")[0];
+                  exportToCsv(`aurix-properties-${dateStr}.csv`, columns, filteredProperties);
+                  toast.success(t.messages.exportSuccess);
+                  logAuditAction({
+                    action: "export",
+                    resource: "property",
+                    metadata: { count: filteredProperties.length, format: "csv" },
+                  }).catch(() => {});
+                } catch {
+                  toast.error(t.messages.exportError);
+                }
+              }}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {t.common.export}
+            </Button>
             <div className="flex items-center rounded-xl border p-1 bg-white">
               <Button variant="ghost" size="sm" className="bg-violet-50 text-violet-700 rounded-lg">
                 <LayoutGrid className="h-4 w-4" />

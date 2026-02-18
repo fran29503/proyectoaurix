@@ -34,6 +34,7 @@ import {
   MoreHorizontal,
   Pencil,
   Trash2,
+  Download,
 } from "lucide-react";
 import { cn, getInitials, formatDate, formatRelativeTime } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -46,6 +47,9 @@ import {
 } from "@/lib/queries/tasks";
 import { TaskModal } from "@/components/tasks/task-modal";
 import { DeleteTaskDialog } from "@/components/tasks/delete-task-dialog";
+import { logAuditAction } from "@/lib/queries/audit";
+import { exportToCsv, getTaskCsvColumns } from "@/lib/export";
+import { toast } from "sonner";
 import { useLanguage } from "@/lib/i18n";
 import { Can, useCurrentUser } from "@/lib/rbac";
 
@@ -313,6 +317,29 @@ export default function TasksPage() {
                 {t.common.refresh}
               </Button>
             </motion.div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-xl"
+              onClick={() => {
+                try {
+                  const columns = getTaskCsvColumns(t);
+                  const dateStr = new Date().toISOString().split("T")[0];
+                  exportToCsv(`aurix-tasks-${dateStr}.csv`, columns, tasks);
+                  toast.success(t.messages.exportSuccess);
+                  logAuditAction({
+                    action: "export",
+                    resource: "task",
+                    metadata: { count: tasks.length, format: "csv" },
+                  }).catch(() => {});
+                } catch {
+                  toast.error(t.messages.exportError);
+                }
+              }}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {t.common.export}
+            </Button>
             <Can resource="tasks" action="create">
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button

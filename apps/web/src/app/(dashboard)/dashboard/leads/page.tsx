@@ -8,6 +8,9 @@ import { DeleteLeadDialog } from "@/components/leads/delete-lead-dialog";
 import { AssignLeadDialog } from "@/components/leads/assign-lead-dialog";
 import { Plus, Download, Upload, Loader2, RefreshCw } from "lucide-react";
 import { getLeads, type Lead } from "@/lib/queries/leads";
+import { logAuditAction } from "@/lib/queries/audit";
+import { exportToCsv, getLeadCsvColumns } from "@/lib/export";
+import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { FadeIn, HoverLift } from "@/components/ui/motion";
 import { useLanguage } from "@/lib/i18n";
@@ -186,7 +189,26 @@ export default function LeadsPage() {
               </Button>
             </Can>
             <Can resource="leads" action="export">
-              <Button variant="outline" size="sm" className="rounded-xl">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-xl"
+                onClick={() => {
+                  try {
+                    const columns = getLeadCsvColumns(t);
+                    const dateStr = new Date().toISOString().split("T")[0];
+                    exportToCsv(`aurix-leads-${dateStr}.csv`, columns, leads);
+                    toast.success(t.messages.exportSuccess);
+                    logAuditAction({
+                      action: "export",
+                      resource: "lead",
+                      metadata: { count: leads.length, format: "csv" },
+                    }).catch(() => {});
+                  } catch {
+                    toast.error(t.messages.exportError);
+                  }
+                }}
+              >
                 <Download className="mr-2 h-4 w-4" />
                 {t.common.export}
               </Button>

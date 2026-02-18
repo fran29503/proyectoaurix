@@ -28,6 +28,8 @@ import { ConversionFunnel, type FunnelStage } from "@/components/charts/conversi
 import { ChannelPieChart } from "@/components/charts/channel-pie-chart";
 import { AgentPerformanceChart } from "@/components/charts/agent-performance-chart";
 import { useLanguage } from "@/lib/i18n";
+import { logAuditAction } from "@/lib/queries/audit";
+import { toast } from "sonner";
 import { motion } from "framer-motion";
 import {
   getReportsData,
@@ -209,9 +211,21 @@ export default function ReportsPage() {
               <SelectItem value="year">{t.reports.thisYear}</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              window.print();
+              logAuditAction({
+                action: "export",
+                resource: "report",
+                metadata: { format: "pdf", market, period },
+              }).catch(() => {});
+              toast.success(t.messages.exportSuccess);
+            }}
+          >
             <Download className="h-4 w-4 mr-2" />
-            {t.common.export}
+            Export PDF
           </Button>
         </div>
       </div>

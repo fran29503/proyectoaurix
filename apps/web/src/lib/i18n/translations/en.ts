@@ -512,6 +512,8 @@ export const en = {
     passwordUpdated: "Password updated successfully",
     passwordError: "Error updating password",
     profileUpdated: "Profile updated successfully",
+    exportSuccess: "Data exported successfully",
+    exportError: "Failed to export data",
   },
 
   // Profile
