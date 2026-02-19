@@ -6,6 +6,7 @@ import { LeadsTable } from "@/components/leads/leads-table";
 import { LeadModal } from "@/components/leads/lead-modal";
 import { DeleteLeadDialog } from "@/components/leads/delete-lead-dialog";
 import { AssignLeadDialog } from "@/components/leads/assign-lead-dialog";
+import { ImportLeadsModal } from "@/components/leads/import-leads-modal";
 import { Plus, Download, Upload, Loader2, RefreshCw } from "lucide-react";
 import { getLeads, type Lead } from "@/lib/queries/leads";
 import { logAuditAction } from "@/lib/queries/audit";
@@ -67,6 +68,7 @@ export default function LeadsPage() {
   const [editingLead, setEditingLead] = useState<Lead | null>(null);
   const [deletingLead, setDeletingLead] = useState<{ id: string; full_name: string } | null>(null);
   const [assigningLead, setAssigningLead] = useState<{ id: string; full_name: string; assigned_to: string | null } | null>(null);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   const fetchLeads = useCallback(async () => {
     try {
@@ -183,7 +185,7 @@ export default function LeadsPage() {
               </Button>
             </motion.div>
             <Can resource="leads" action="import">
-              <Button variant="outline" size="sm" className="rounded-xl">
+              <Button variant="outline" size="sm" className="rounded-xl" onClick={() => setShowImportModal(true)}>
                 <Upload className="mr-2 h-4 w-4" />
                 {t.common.import}
               </Button>
@@ -288,6 +290,12 @@ export default function LeadsPage() {
         open={!!assigningLead}
         onOpenChange={(open) => !open && setAssigningLead(null)}
         lead={assigningLead}
+        onSuccess={fetchLeads}
+      />
+
+      <ImportLeadsModal
+        open={showImportModal}
+        onOpenChange={setShowImportModal}
         onSuccess={fetchLeads}
       />
     </div>

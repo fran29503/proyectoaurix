@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Search, Command, Sparkles } from "lucide-react";
+import { Bell, Search, Command, Sparkles, Users, Building2, CheckSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,29 +16,122 @@ import { Badge } from "@/components/ui/badge";
 import { useSignOut } from "@/lib/hooks/use-user";
 import { getInitials } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { LanguageSelector } from "./language-selector";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrentUser } from "@/lib/rbac";
+import { globalSearch, type SearchResult } from "@/lib/queries/search";
+import { getNotifications, type Notification } from "@/lib/queries/notifications";
+import { useRouter } from "next/navigation";
+
+const typeIcons: Record<string, typeof Users> = {
+  lead: Users,
+  property: Building2,
+  task: CheckSquare,
+};
+
+const typeColors: Record<string, string> = {
+  lead: "text-violet-600 bg-violet-50 dark:bg-violet-900/30",
+  property: "text-amber-600 bg-amber-50 dark:bg-amber-900/30",
+  task: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30",
+};
 
 export function Header() {
   const { signOut } = useSignOut();
   const { t } = useLanguage();
   const { user, loading: userLoading } = useCurrentUser();
+  const router = useRouter();
   const [searchFocused, setSearchFocused] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  // Cmd+K shortcut
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+      if (e.key === "Escape") {
+        searchInputRef.current?.blur();
+        setSearchQuery("");
+        setSearchResults([]);
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, []);
+
+  // Debounced search
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchQuery(value);
+    setSelectedIndex(-1);
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    if (value.length < 2) {
+      setSearchResults([]);
+      setSearching(false);
+      return;
+    }
+    setSearching(true);
+    searchTimeoutRef.current = setTimeout(async () => {
+      const results = await globalSearch(value);
+      setSearchResults(results);
+      setSearching(false);
+    }, 300);
+  }, []);
+
+  // Keyboard navigation in results
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (!searchResults.length) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelectedIndex(i => Math.min(i + 1, searchResults.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedIndex(i => Math.max(i - 1, 0));
+    } else if (e.key === "Enter" && selectedIndex >= 0) {
+      e.preventDefault();
+      const result = searchResults[selectedIndex];
+      router.push(result.href);
+      setSearchQuery("");
+      setSearchResults([]);
+      searchInputRef.current?.blur();
+    }
+  };
+
+  const handleResultClick = (result: SearchResult) => {
+    router.push(result.href);
+    setSearchQuery("");
+    setSearchResults([]);
+    searchInputRef.current?.blur();
+  };
+
+  const showDropdown = searchFocused && (searchQuery.length >= 2);
+
+  // Load real notifications
+  useEffect(() => {
+    getNotifications().then(setNotifications).catch(() => {});
+  }, []);
+
+  // Refresh notifications when dropdown opens
+  const handleNotificationsToggle = (open: boolean) => {
+    setShowNotifications(open);
+    if (open) {
+      getNotifications().then(setNotifications).catch(() => {});
+    }
+  };
 
   // Get translated role name
   const getRoleName = (role: string): string => {
     const roleKey = role as keyof typeof t.roles;
     return t.roles[roleKey] || role;
   };
-
-  const notifications = [
-    { id: 1, title: "New lead assigned", desc: "Ahmed Sharif - Dubai Marina", time: "2m ago", unread: true },
-    { id: 2, title: "Meeting reminder", desc: "Call with Elena Kozlova", time: "1h ago", unread: true },
-    { id: 3, title: "Deal closed!", desc: "Downtown 2BR - AED 3.8M", time: "3h ago", unread: false },
-  ];
 
   const unreadCount = notifications.filter(n => n.unread).length;
 
@@ -56,12 +149,16 @@ export function Header() {
           transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
           className="relative"
         >
-          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 z-10" />
           <Input
+            ref={searchInputRef}
             type="search"
-            placeholder={t.common.search}
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
             onFocus={() => setSearchFocused(true)}
-            onBlur={() => setSearchFocused(false)}
+            onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
+            onKeyDown={handleSearchKeyDown}
+            placeholder={t.common.search}
             className="h-10 pl-10 pr-20 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:border-violet-300 focus:ring-2 focus:ring-violet-500/10 transition-all duration-200"
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs text-slate-400">
@@ -70,6 +167,49 @@ export function Header() {
             </kbd>
             <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-medium">K</kbd>
           </div>
+
+          {/* Search Results Dropdown */}
+          <AnimatePresence>
+            {showDropdown && (
+              <motion.div
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 4 }}
+                transition={{ duration: 0.15 }}
+                className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden z-50"
+              >
+                {searching ? (
+                  <div className="p-4 text-center text-sm text-slate-400">{t.common.loading}</div>
+                ) : searchResults.length > 0 ? (
+                  <div className="max-h-80 overflow-y-auto py-1">
+                    {searchResults.map((result, index) => {
+                      const Icon = typeIcons[result.type] || Search;
+                      return (
+                        <button
+                          key={`${result.type}-${result.id}`}
+                          onMouseDown={() => handleResultClick(result)}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${
+                            index === selectedIndex ? "bg-violet-50 dark:bg-violet-900/20" : ""
+                          }`}
+                        >
+                          <div className={`flex items-center justify-center w-8 h-8 rounded-lg ${typeColors[result.type]}`}>
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">{result.title}</p>
+                            <p className="text-xs text-slate-500 truncate">{result.subtitle}</p>
+                          </div>
+                          <span className="text-[10px] uppercase font-medium text-slate-400 tracking-wider">{result.type}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="p-4 text-center text-sm text-slate-400">{t.common.noResults}</div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       </div>
 
@@ -88,7 +228,7 @@ export function Header() {
         </motion.div>
 
         {/* Notifications */}
-        <DropdownMenu open={showNotifications} onOpenChange={setShowNotifications}>
+        <DropdownMenu open={showNotifications} onOpenChange={handleNotificationsToggle}>
           <DropdownMenuTrigger asChild>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
@@ -125,28 +265,34 @@ export function Header() {
               </div>
             </div>
             <div className="max-h-80 overflow-y-auto">
-              {notifications.map((notif, index) => (
-                <motion.div
-                  key={notif.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className={`p-4 border-b border-slate-50 hover:bg-slate-50 cursor-pointer transition-colors ${
-                    notif.unread ? "bg-violet-50/50" : ""
-                  }`}
-                >
-                  <div className="flex gap-3">
-                    <div className={`w-2 h-2 mt-2 rounded-full flex-shrink-0 ${
-                      notif.unread ? "bg-violet-500" : "bg-transparent"
-                    }`} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-900">{notif.title}</p>
-                      <p className="text-sm text-slate-500 truncate">{notif.desc}</p>
-                      <p className="text-xs text-slate-400 mt-1">{notif.time}</p>
+              {notifications.length === 0 ? (
+                <div className="p-6 text-center text-sm text-slate-400">
+                  {t.user.noNotifications}
+                </div>
+              ) : (
+                notifications.map((notif, index) => (
+                  <motion.div
+                    key={notif.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className={`p-4 border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors ${
+                      notif.unread ? "bg-violet-50/50 dark:bg-violet-900/10" : ""
+                    }`}
+                  >
+                    <div className="flex gap-3">
+                      <div className={`w-2 h-2 mt-2 rounded-full flex-shrink-0 ${
+                        notif.unread ? "bg-violet-500" : "bg-transparent"
+                      }`} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{notif.title}</p>
+                        <p className="text-sm text-slate-500 truncate">{notif.description}</p>
+                        <p className="text-xs text-slate-400 mt-1">{notif.time}</p>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))
+              )}
             </div>
             <div className="p-3 border-t border-slate-100">
               <Button variant="ghost" className="w-full text-sm text-violet-600 hover:text-violet-700 hover:bg-violet-50 rounded-lg">
