@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
     const response = NextResponse.redirect(url);
     // Set demo cookie for 24 hours
     response.cookies.set("demo_mode", "true", {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 60 * 60 * 24, // 24 hours

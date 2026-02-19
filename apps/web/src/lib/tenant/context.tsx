@@ -114,19 +114,17 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
           if (hostname.includes(".aurix.app") || hostname.includes(".aurix.com")) {
             slug = hostname.split(".")[0];
           }
-          // For localhost or custom domains, try to get from a cookie or default
-          else if (hostname === "localhost" || hostname === "127.0.0.1") {
-            // In development, use default tenant or check cookie
-            slug = "meridian-harbor"; // Default for development
+          // For localhost, Vercel preview, or custom domains — use default tenant
+          else {
+            slug = "meridian-harbor";
           }
         }
 
         if (!slug) {
-          // If no slug found, get the first active tenant (for MVP)
+          // If no slug found, get the first tenant (for MVP)
           const { data: tenants, error: fetchError } = await supabase
             .from("tenants")
             .select("*")
-            .eq("is_active", true)
             .limit(1);
 
           if (fetchError) throw fetchError;

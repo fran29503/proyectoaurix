@@ -42,6 +42,8 @@ export function useSignOut() {
     } catch {
       // Ignore errors — always redirect to login
     } finally {
+      // Clear demo mode cookie if present
+      document.cookie = "demo_mode=; path=/; max-age=0";
       setLoading(false);
       window.location.href = "/login";
     }
