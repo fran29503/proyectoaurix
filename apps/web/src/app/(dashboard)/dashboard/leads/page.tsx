@@ -164,14 +164,14 @@ export default function LeadsPage() {
     <div className="space-y-6">
       {/* Header */}
       <FadeIn>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">{t.leads.title}</h1>
-            <p className="text-slate-500 mt-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{t.leads.title}</h1>
+            <p className="text-slate-500 mt-1 text-sm md:text-base hidden sm:block">
               {t.leads.searchPlaceholder}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3 flex-wrap">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 variant="outline"
@@ -232,7 +232,7 @@ export default function LeadsPage() {
       </FadeIn>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-4">
         {[
           { label: t.dashboard.totalLeads, value: stats.total, color: "slate" },
           { label: t.leadStatus.nuevo, value: stats.nuevo, color: "slate" },

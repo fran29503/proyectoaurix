@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Search, Command, Sparkles, Users, Building2, CheckSquare } from "lucide-react";
+import { Bell, Search, Command, Sparkles, Users, Building2, CheckSquare, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -20,6 +20,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { LanguageSelector } from "./language-selector";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrentUser } from "@/lib/rbac";
+import { useMobileSidebar } from "./sidebar";
 import { globalSearch, type SearchResult } from "@/lib/queries/search";
 import { getNotifications, type Notification } from "@/lib/queries/notifications";
 import { useRouter } from "next/navigation";
@@ -41,6 +42,7 @@ export function Header() {
   const { t } = useLanguage();
   const { user, loading: userLoading } = useCurrentUser();
   const router = useRouter();
+  const { toggle: toggleMobileSidebar } = useMobileSidebar();
   const [searchFocused, setSearchFocused] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -140,15 +142,16 @@ export function Header() {
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="flex h-16 items-center justify-between border-b border-slate-100 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-6"
+      className="flex h-14 md:h-16 items-center justify-between border-b border-slate-100 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-3 md:px-6 gap-2 md:gap-4"
     >
-      {/* Search */}
-      <div className="flex items-center gap-4">
-        <motion.div
-          animate={{ width: searchFocused ? 480 : 400 }}
-          transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="relative"
-        >
+      {/* Left: Mobile menu + Search */}
+      <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
+        {/* Mobile hamburger */}
+        <Button variant="ghost" size="icon" className="lg:hidden h-9 w-9 flex-shrink-0 rounded-xl" onClick={toggleMobileSidebar}>
+          <Menu className="h-5 w-5" />
+        </Button>
+
+        <div className="relative flex-1 max-w-[480px] hidden sm:block">
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 z-10" />
           <Input
             ref={searchInputRef}
@@ -161,7 +164,7 @@ export function Header() {
             placeholder={t.common.search}
             className="h-10 pl-10 pr-20 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:border-violet-300 focus:ring-2 focus:ring-violet-500/10 transition-all duration-200"
           />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs text-slate-400">
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 hidden md:flex items-center gap-1 text-xs text-slate-400">
             <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-medium">
               <Command className="w-3 h-3 inline" />
             </kbd>
@@ -210,20 +213,25 @@ export function Header() {
               </motion.div>
             )}
           </AnimatePresence>
-        </motion.div>
+        </div>
+
+        {/* Mobile search icon */}
+        <Button variant="ghost" size="icon" className="sm:hidden h-9 w-9 flex-shrink-0 rounded-xl" onClick={() => searchInputRef.current?.focus()}>
+          <Search className="h-4 w-4" />
+        </Button>
       </div>
 
       {/* Right side */}
-      <div className="flex items-center gap-2">
-        {/* AI Assistant button */}
-        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+      <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+        {/* AI Assistant button - hidden on mobile */}
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="hidden md:block">
           <Button
             variant="ghost"
             size="sm"
             className="h-9 px-3 gap-2 text-violet-600 hover:text-violet-700 hover:bg-violet-50 rounded-xl"
           >
             <Sparkles className="h-4 w-4" />
-            <span className="hidden sm:inline">{t.dashboard.aiInsights}</span>
+            <span className="hidden lg:inline">{t.dashboard.aiInsights}</span>
           </Button>
         </motion.div>
 
@@ -303,7 +311,7 @@ export function Header() {
         </DropdownMenu>
 
         {/* Divider */}
-        <div className="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-2" />
+        <div className="hidden md:block h-8 w-px bg-slate-200 dark:bg-slate-700 mx-2" />
 
         {/* User menu */}
         <DropdownMenu>

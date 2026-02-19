@@ -97,18 +97,18 @@ function KPICard({ kpi, index }: { kpi: KPIData; index: number }) {
           {/* Gradient accent */}
           <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${kpi.gradient}`} />
 
-          <CardContent className="p-6 flex flex-col justify-between h-full min-h-[160px]">
-            <div className="flex items-center justify-between mb-4">
+          <CardContent className="p-4 md:p-6 flex flex-col justify-between h-full min-h-[130px] md:min-h-[160px]">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
               <motion.div
                 whileHover={{ scale: 1.1, rotate: 5 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${kpi.gradient} shadow-lg`}
+                className={`flex h-9 w-9 md:h-12 md:w-12 items-center justify-center rounded-lg md:rounded-xl bg-gradient-to-br ${kpi.gradient} shadow-lg`}
               >
-                <Icon className="h-6 w-6 text-white" />
+                <Icon className="h-4 w-4 md:h-6 md:w-6 text-white" />
               </motion.div>
-              <div className={`flex items-center gap-1 text-sm font-medium ${isUp ? "text-emerald-600" : "text-slate-400"}`}>
-                {isUp && <ArrowUpRight className="h-4 w-4" />}
-                {kpi.change || "\u00A0"}
+              <div className={`flex items-center gap-1 text-xs md:text-sm font-medium ${isUp ? "text-emerald-600" : "text-slate-400"}`}>
+                {isUp && <ArrowUpRight className="h-3 w-3 md:h-4 md:w-4" />}
+                <span className="hidden sm:inline">{kpi.change || "\u00A0"}</span>
               </div>
             </div>
             <motion.div
@@ -116,9 +116,9 @@ function KPICard({ kpi, index }: { kpi: KPIData; index: number }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + index * 0.05 }}
             >
-              <h3 className="text-3xl font-bold text-slate-900">{kpi.value}</h3>
-              <p className="text-sm font-medium text-slate-600 mt-1">{kpi.title}</p>
-              <p className="text-xs text-slate-400 mt-0.5">{kpi.description || "\u00A0"}</p>
+              <h3 className="text-xl md:text-3xl font-bold text-slate-900">{kpi.value}</h3>
+              <p className="text-xs md:text-sm font-medium text-slate-600 mt-1 truncate">{kpi.title}</p>
+              <p className="text-[10px] md:text-xs text-slate-400 mt-0.5 truncate hidden sm:block">{kpi.description || "\u00A0"}</p>
             </motion.div>
           </CardContent>
         </Card>
@@ -255,15 +255,15 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8">
       {/* Page Header */}
       <FadeIn>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <motion.h1
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="text-3xl font-bold text-slate-900"
+              className="text-2xl md:text-3xl font-bold text-slate-900"
             >
               {t.dashboard.title}
             </motion.h1>
@@ -271,7 +271,7 @@ export default function DashboardPage() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-slate-500 mt-1"
+              className="text-slate-500 mt-1 text-sm md:text-base"
             >
               {t.dashboard.welcome}
             </motion.p>
@@ -280,7 +280,7 @@ export default function DashboardPage() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="flex items-center gap-3"
+            className="flex items-center gap-2 md:gap-3"
           >
             <Button
               variant="outline"
@@ -290,7 +290,7 @@ export default function DashboardPage() {
               className="gap-2 rounded-xl"
             >
               <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
-              {t.common.refresh}
+              <span className="hidden sm:inline">{t.common.refresh}</span>
             </Button>
             <Badge variant="outline" className="gap-1.5 px-3 py-1.5 border-emerald-200 bg-emerald-50 text-emerald-700">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -301,7 +301,7 @@ export default function DashboardPage() {
       </FadeIn>
 
       {/* KPI Cards */}
-      <StaggerContainer className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <StaggerContainer className="grid gap-4 md:gap-6 grid-cols-2 lg:grid-cols-4">
         {kpis.map((kpi, index) => (
           <KPICard key={kpi.id} kpi={kpi} index={index} />
         ))}
@@ -317,26 +317,26 @@ export default function DashboardPage() {
             transition={{ duration: 0.2 }}
           >
             <Card className="border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 overflow-hidden">
-              <CardContent className="py-4 px-5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
+              <CardContent className="py-3 md:py-4 px-4 md:px-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 md:gap-4">
                     <motion.div
                       animate={{ scale: [1, 1.1, 1] }}
                       transition={{ duration: 2, repeat: Infinity }}
-                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500 shadow-lg shadow-amber-500/30"
+                      className="flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-xl bg-amber-500 shadow-lg shadow-amber-500/30 flex-shrink-0"
                     >
-                      <AlertTriangle className="h-5 w-5 text-white" />
+                      <AlertTriangle className="h-4 w-4 md:h-5 md:w-5 text-white" />
                     </motion.div>
-                    <div>
-                      <p className="font-semibold text-amber-900">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-amber-900 text-sm md:text-base">
                         {slaAlerts.length} {t.dashboard.leadsExceedingSLA}
                       </p>
-                      <p className="text-sm text-amber-700">
+                      <p className="text-xs md:text-sm text-amber-700 truncate">
                         {t.dashboard.immediateActionRequired}
                       </p>
                     </div>
                   </div>
-                  <Link href="/dashboard/leads?filter=sla_alert">
+                  <Link href="/dashboard/leads?filter=sla_alert" className="flex-shrink-0">
                     <Button variant="ghost" size="sm" className="text-amber-700 hover:text-amber-900 hover:bg-amber-100">
                       {t.common.viewAll}
                       <ChevronRight className="h-4 w-4 ml-1" />
@@ -350,7 +350,7 @@ export default function DashboardPage() {
       )}
 
       {/* Main Charts Row */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 md:gap-6 lg:grid-cols-2">
         <FadeIn delay={0.4} direction="left">
           <HoverLift liftAmount={-2}>
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
@@ -365,7 +365,7 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <LeadTrendChart />
-                <div className="flex items-center justify-center gap-8 mt-6 pt-4 border-t border-slate-100">
+                <div className="flex items-center justify-center gap-4 md:gap-8 mt-4 md:mt-6 pt-3 md:pt-4 border-t border-slate-100">
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-3 rounded-full bg-slate-900" />
                     <span className="text-sm text-slate-600">{t.market.dubai}</span>
@@ -404,7 +404,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Second Row */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-4 md:gap-6 lg:grid-cols-3">
         <FadeIn delay={0.6} className="lg:col-span-2">
           <HoverLift liftAmount={-2}>
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
@@ -422,7 +422,7 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <AgentPerformanceChart />
-                <div className="flex items-center justify-center gap-8 mt-6 pt-4 border-t border-slate-100">
+                <div className="flex items-center justify-center gap-4 md:gap-8 mt-4 md:mt-6 pt-3 md:pt-4 border-t border-slate-100">
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-3 rounded bg-slate-900" />
                     <span className="text-sm text-slate-600">{t.dashboard.leadsLabel}</span>
@@ -492,7 +492,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Third Row */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-4 md:gap-6 lg:grid-cols-3">
         <FadeIn delay={0.8} className="lg:col-span-2">
           <HoverLift liftAmount={-2}>
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
@@ -609,10 +609,10 @@ export default function DashboardPage() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 1.1 + index * 0.1 }}
                   whileHover={{ scale: 1.01, x: 5 }}
-                  className="flex items-center justify-between rounded-xl bg-white p-4 shadow-sm hover:shadow-md transition-all cursor-pointer"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl bg-white p-3 md:p-4 shadow-sm hover:shadow-md transition-all cursor-pointer"
                 >
-                  <div className="flex items-center gap-4">
-                    <Avatar className="h-10 w-10 ring-2 ring-white shadow-sm">
+                  <div className="flex items-center gap-3 md:gap-4 min-w-0">
+                    <Avatar className="h-9 w-9 md:h-10 md:w-10 ring-2 ring-white shadow-sm flex-shrink-0">
                       <AvatarFallback className={`text-xs font-semibold ${
                         alert.severity === "high"
                           ? "bg-red-100 text-red-700"
@@ -621,16 +621,16 @@ export default function DashboardPage() {
                         {getInitials(alert.leadName)}
                       </AvatarFallback>
                     </Avatar>
-                    <div>
-                      <p className="font-medium text-slate-900">{alert.leadName}</p>
-                      <p className="text-sm text-slate-500">
+                    <div className="min-w-0">
+                      <p className="font-medium text-slate-900 text-sm md:text-base truncate">{alert.leadName}</p>
+                      <p className="text-xs md:text-sm text-slate-500 truncate">
                         {alert.market} · {t.dashboard.assignedTo} {alert.assignee}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 md:gap-3 flex-shrink-0 ml-12 sm:ml-0">
                     <Badge
-                      className={`flex items-center gap-1.5 ${
+                      className={`flex items-center gap-1.5 text-xs ${
                         alert.severity === "high"
                           ? "bg-red-100 text-red-700 border-red-200"
                           : "bg-amber-100 text-amber-700 border-amber-200"
@@ -641,11 +641,9 @@ export default function DashboardPage() {
                       {t.dashboard.waiting}
                     </Badge>
                     <Link href={`/dashboard/leads/${alert.id}`}>
-                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                        <Button size="sm" className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-lg shadow-violet-500/25">
-                          {t.dashboard.contactNow}
-                        </Button>
-                      </motion.div>
+                      <Button size="sm" className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-lg shadow-violet-500/25 text-xs">
+                        {t.dashboard.contactNow}
+                      </Button>
                     </Link>
                   </div>
                 </motion.div>
