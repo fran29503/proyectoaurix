@@ -7,14 +7,9 @@ import { cn } from "@/lib/utils";
 interface HorizontalScrollProps {
   children: React.ReactNode;
   className?: string;
-  /** Additional classes for the scrollable inner container */
   innerClassName?: string;
-  /** Scroll amount in pixels per click (default 300) */
   scrollAmount?: number;
-  /** Arrow button size variant */
   arrowSize?: "sm" | "md";
-  /** Tailwind gradient class for edge fade (e.g. "from-slate-50") */
-  fadeFrom?: string;
 }
 
 export function HorizontalScroll({
@@ -23,11 +18,12 @@ export function HorizontalScroll({
   innerClassName,
   scrollAmount = 300,
   arrowSize = "md",
-  fadeFrom = "from-white dark:from-slate-950",
 }: HorizontalScrollProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [cursorZone, setCursorZone] = useState<"left" | "right" | "center" | "out">("out");
 
   const checkScroll = useCallback(() => {
     const el = scrollRef.current;
@@ -53,6 +49,38 @@ export function HorizontalScroll({
     };
   }, [checkScroll]);
 
+  // Track cursor position relative to the container
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const edgeZone = 64; // px from edge to trigger arrow
+
+      if (x < edgeZone) {
+        setCursorZone("left");
+      } else if (x > rect.width - edgeZone) {
+        setCursorZone("right");
+      } else {
+        setCursorZone("center");
+      }
+    };
+
+    const handleMouseLeave = () => {
+      setCursorZone("out");
+    };
+
+    container.addEventListener("mousemove", handleMouseMove);
+    container.addEventListener("mouseleave", handleMouseLeave);
+
+    return () => {
+      container.removeEventListener("mousemove", handleMouseMove);
+      container.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, []);
+
   const scroll = (direction: "left" | "right") => {
     const el = scrollRef.current;
     if (!el) return;
@@ -60,91 +88,76 @@ export function HorizontalScroll({
     el.scrollBy({ left: amount, behavior: "smooth" });
   };
 
+  const showLeft = canScrollLeft && cursorZone === "left";
+  const showRight = canScrollRight && cursorZone === "right";
   const isSmall = arrowSize === "sm";
 
   return (
-    <div className={cn("relative group/scroll", className)}>
-      {/* Left arrow */}
+    <div ref={containerRef} className={cn("relative", className)}>
+      {/* Left zone — clickable area + arrow */}
       <div
         className={cn(
-          "absolute left-0 top-0 bottom-0 z-10 flex items-center pointer-events-none transition-opacity duration-200",
-          canScrollLeft ? "opacity-100" : "opacity-0"
+          "absolute left-0 top-0 bottom-0 z-10 flex items-center",
+          "transition-opacity duration-300 ease-out",
+          showLeft ? "opacity-100" : "opacity-0 pointer-events-none"
         )}
       >
         <button
           onClick={() => scroll("left")}
-          disabled={!canScrollLeft}
           className={cn(
-            "pointer-events-auto flex items-center justify-center rounded-full",
-            "bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm",
-            "border border-slate-200 dark:border-slate-700",
-            "shadow-lg shadow-black/5",
-            "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200",
-            "hover:bg-white dark:hover:bg-slate-800 hover:border-slate-300",
-            "transition-all duration-200 hover:scale-105 active:scale-95",
-            "disabled:opacity-0 disabled:pointer-events-none",
-            isSmall ? "h-7 w-7 ml-1" : "h-8 w-8 ml-1.5"
+            "flex items-center justify-center cursor-pointer",
+            "text-slate-400 hover:text-violet-500",
+            "transition-all duration-200 hover:scale-110 active:scale-90",
+            isSmall ? "h-10 w-8 ml-0.5" : "h-12 w-10 ml-1"
           )}
           aria-label="Scroll left"
         >
-          <ChevronLeft className={isSmall ? "h-3.5 w-3.5" : "h-4 w-4"} />
+          <ChevronLeft
+            className={cn(
+              "drop-shadow-sm",
+              isSmall ? "h-4 w-4" : "h-5 w-5"
+            )}
+            strokeWidth={2.5}
+          />
         </button>
       </div>
 
       {/* Scrollable content */}
       <div
         ref={scrollRef}
-        className={cn(
-          "overflow-x-auto scrollbar-thin",
-          innerClassName
-        )}
+        className={cn("overflow-x-auto", innerClassName)}
         style={{ scrollbarWidth: "thin" }}
       >
         {children}
       </div>
 
-      {/* Right arrow */}
+      {/* Right zone — clickable area + arrow */}
       <div
         className={cn(
-          "absolute right-0 top-0 bottom-0 z-10 flex items-center pointer-events-none transition-opacity duration-200",
-          canScrollRight ? "opacity-100" : "opacity-0"
+          "absolute right-0 top-0 bottom-0 z-10 flex items-center",
+          "transition-opacity duration-300 ease-out",
+          showRight ? "opacity-100" : "opacity-0 pointer-events-none"
         )}
       >
         <button
           onClick={() => scroll("right")}
-          disabled={!canScrollRight}
           className={cn(
-            "pointer-events-auto flex items-center justify-center rounded-full",
-            "bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm",
-            "border border-slate-200 dark:border-slate-700",
-            "shadow-lg shadow-black/5",
-            "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200",
-            "hover:bg-white dark:hover:bg-slate-800 hover:border-slate-300",
-            "transition-all duration-200 hover:scale-105 active:scale-95",
-            "disabled:opacity-0 disabled:pointer-events-none",
-            isSmall ? "h-7 w-7 mr-1" : "h-8 w-8 mr-1.5"
+            "flex items-center justify-center cursor-pointer",
+            "text-slate-400 hover:text-violet-500",
+            "transition-all duration-200 hover:scale-110 active:scale-90",
+            isSmall ? "h-10 w-8 mr-0.5" : "h-12 w-10 mr-1"
           )}
           aria-label="Scroll right"
         >
-          <ChevronRight className={isSmall ? "h-3.5 w-3.5" : "h-4 w-4"} />
+          <ChevronRight
+            className={cn(
+              "drop-shadow-sm",
+              isSmall ? "h-4 w-4" : "h-5 w-5"
+            )}
+            strokeWidth={2.5}
+          />
         </button>
       </div>
-
-      {/* Fade edges when scrollable */}
-      <div
-        className={cn(
-          "absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r to-transparent pointer-events-none transition-opacity duration-200 z-[5]",
-          fadeFrom,
-          canScrollLeft ? "opacity-100" : "opacity-0"
-        )}
-      />
-      <div
-        className={cn(
-          "absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l to-transparent pointer-events-none transition-opacity duration-200 z-[5]",
-          fadeFrom,
-          canScrollRight ? "opacity-100" : "opacity-0"
-        )}
-      />
     </div>
   );
 }

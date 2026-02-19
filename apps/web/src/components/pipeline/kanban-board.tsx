@@ -543,7 +543,7 @@ export function KanbanBoard({ leads: initialLeads, onLeadUpdate }: KanbanBoardPr
         </motion.div>
 
         {/* Board */}
-        <HorizontalScroll scrollAmount={288} fadeFrom="from-slate-50 dark:from-slate-950">
+        <HorizontalScroll scrollAmount={288}>
           <div className="flex gap-4 pb-4">
             {activeStages.map((stage, index) => (
               <motion.div
