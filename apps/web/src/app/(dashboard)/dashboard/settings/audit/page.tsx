@@ -46,6 +46,7 @@ import {
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { FadeIn, HoverLift } from "@/components/ui/motion";
+import { HorizontalScroll } from "@/components/ui/horizontal-scroll";
 import { exportToCsv, getAuditCsvColumns } from "@/lib/export";
 import { toast } from "sonner";
 import { useLanguage } from "@/lib/i18n";
@@ -396,7 +397,8 @@ export default function AuditLogPage() {
 
       {/* Logs Table */}
       <Card className="border-0 shadow-lg">
-        <CardContent className="p-0 overflow-x-auto">
+        <CardContent className="p-0">
+          <HorizontalScroll arrowSize="sm">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50">
@@ -480,6 +482,7 @@ export default function AuditLogPage() {
               )}
             </TableBody>
           </Table>
+          </HorizontalScroll>
 
           {/* Pagination */}
           {totalPages > 1 && (

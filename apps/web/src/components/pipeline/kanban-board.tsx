@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { HorizontalScroll } from "@/components/ui/horizontal-scroll";
 import {
   Select,
   SelectContent,
@@ -543,7 +543,7 @@ export function KanbanBoard({ leads: initialLeads, onLeadUpdate }: KanbanBoardPr
         </motion.div>
 
         {/* Board */}
-        <ScrollArea className="w-full">
+        <HorizontalScroll scrollAmount={288} fadeFrom="from-slate-50 dark:from-slate-950">
           <div className="flex gap-4 pb-4">
             {activeStages.map((stage, index) => (
               <motion.div
@@ -560,8 +560,7 @@ export function KanbanBoard({ leads: initialLeads, onLeadUpdate }: KanbanBoardPr
               </motion.div>
             ))}
           </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+        </HorizontalScroll>
       </div>
 
       {/* Drag Overlay */}

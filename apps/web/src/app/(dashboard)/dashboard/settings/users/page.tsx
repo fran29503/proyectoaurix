@@ -46,6 +46,7 @@ import {
 import { cn, getInitials } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { FadeIn, HoverLift } from "@/components/ui/motion";
+import { HorizontalScroll } from "@/components/ui/horizontal-scroll";
 import { toast } from "sonner";
 import { useLanguage } from "@/lib/i18n";
 import {
@@ -408,7 +409,8 @@ export default function UserManagementPage() {
 
       {/* Users Table */}
       <Card className="border-0 shadow-lg">
-        <CardContent className="p-0 overflow-x-auto">
+        <CardContent className="p-0">
+          <HorizontalScroll arrowSize="sm">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50">
@@ -551,6 +553,7 @@ export default function UserManagementPage() {
               )}
             </TableBody>
           </Table>
+          </HorizontalScroll>
         </CardContent>
       </Card>
 

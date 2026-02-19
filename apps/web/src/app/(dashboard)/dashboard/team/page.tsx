@@ -38,6 +38,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn, getInitials } from "@/lib/utils";
+import { HorizontalScroll } from "@/components/ui/horizontal-scroll";
 import { getTeamMembers, roleLabels, teamLabels, type TeamMember } from "@/lib/queries/team";
 import { useLanguage } from "@/lib/i18n";
 import { Can, ManagerOrAbove } from "@/lib/rbac";
@@ -276,7 +277,8 @@ export default function TeamPage() {
 
       {/* Team Table */}
       <Card>
-        <CardContent className="p-0 overflow-x-auto">
+        <CardContent className="p-0">
+          <HorizontalScroll arrowSize="sm">
           <Table>
             <TableHeader>
               <TableRow>
@@ -302,6 +304,7 @@ export default function TeamPage() {
               )}
             </TableBody>
           </Table>
+          </HorizontalScroll>
         </CardContent>
       </Card>
     </div>

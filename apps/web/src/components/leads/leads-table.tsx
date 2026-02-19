@@ -32,6 +32,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { HorizontalScroll } from "@/components/ui/horizontal-scroll";
 import {
   ChevronLeft,
   ChevronRight,
@@ -386,7 +387,7 @@ export function LeadsTable({ data, onEdit, onDelete, onAssign }: LeadsTableProps
       </div>
 
       {/* Table */}
-      <div className="rounded-lg border bg-white overflow-x-auto">
+      <HorizontalScroll className="rounded-lg border bg-white" arrowSize="sm">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -421,7 +422,7 @@ export function LeadsTable({ data, onEdit, onDelete, onAssign }: LeadsTableProps
             )}
           </TableBody>
         </Table>
-      </div>
+      </HorizontalScroll>
 
       {/* Pagination */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
