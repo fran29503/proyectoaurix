@@ -215,21 +215,21 @@ export default function AuditLogPage() {
     <div className="space-y-6">
       {/* Header */}
       <FadeIn>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-3 mb-1">
               <Link href="/dashboard/settings" className="text-slate-400 hover:text-slate-600">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
-              <h1 className="text-3xl font-bold text-slate-900">
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
                 {t.audit?.title || "Audit Log"}
               </h1>
             </div>
-            <p className="text-slate-500 ml-8">
+            <p className="text-slate-500 ml-8 text-sm md:text-base hidden sm:block">
               {t.audit?.subtitle || "Track all user actions and system changes"}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3 flex-wrap">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 variant="outline"
@@ -239,7 +239,7 @@ export default function AuditLogPage() {
                 className="gap-2 rounded-xl"
               >
                 <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
-                {t.common?.refresh}
+                <span className="hidden sm:inline">{t.common?.refresh}</span>
               </Button>
             </motion.div>
             <Button
@@ -254,7 +254,7 @@ export default function AuditLogPage() {
               ) : (
                 <Download className="mr-2 h-4 w-4" />
               )}
-              {t.common?.export}
+              <span className="hidden sm:inline">{t.common?.export}</span>
             </Button>
           </div>
         </div>
@@ -262,7 +262,7 @@ export default function AuditLogPage() {
 
       {/* Stats */}
       {stats && (
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-4">
           <HoverLift>
             <Card className="border-0 shadow-sm">
               <CardContent className="p-4">
@@ -396,7 +396,7 @@ export default function AuditLogPage() {
 
       {/* Logs Table */}
       <Card className="border-0 shadow-lg">
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50">
@@ -483,8 +483,8 @@ export default function AuditLogPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t">
-              <p className="text-sm text-slate-500">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 px-4 py-3 border-t">
+              <p className="text-xs sm:text-sm text-slate-500">
                 {t.common?.showing} {(page - 1) * pageSize + 1} {t.common?.to}{" "}
                 {Math.min(page * pageSize, total)} {t.common?.of} {total}
               </p>

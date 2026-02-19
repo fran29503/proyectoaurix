@@ -252,21 +252,21 @@ export default function UserManagementPage() {
     <div className="space-y-6">
       {/* Header */}
       <FadeIn>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-3 mb-1">
               <Link href="/dashboard/settings" className="text-slate-400 hover:text-slate-600">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
-              <h1 className="text-3xl font-bold text-slate-900">
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
                 {t.settings?.userManagement || "User Management"}
               </h1>
             </div>
-            <p className="text-slate-500 ml-8">
+            <p className="text-slate-500 ml-8 text-sm md:text-base hidden sm:block">
               {t.settings?.userManagementDesc || "Manage team members and their permissions"}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3 flex-wrap">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 variant="outline"
@@ -276,7 +276,7 @@ export default function UserManagementPage() {
                 className="gap-2 rounded-xl"
               >
                 <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
-                {t.common.refresh}
+                <span className="hidden sm:inline">{t.common.refresh}</span>
               </Button>
             </motion.div>
             {creatableRoles.length > 0 && (
@@ -297,7 +297,7 @@ export default function UserManagementPage() {
 
       {/* Stats */}
       {stats && (
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-4">
           {[
             {
               label: t.settings?.totalUsers || "Total Users",
@@ -356,8 +356,8 @@ export default function UserManagementPage() {
       )}
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-4">
-        <div className="relative flex-1 min-w-[200px] max-w-sm">
+      <div className="flex flex-wrap items-center gap-2 md:gap-4">
+        <div className="relative flex-1 min-w-[160px] max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder={t.settings?.searchUsers || "Search users..."}
@@ -408,7 +408,7 @@ export default function UserManagementPage() {
 
       {/* Users Table */}
       <Card className="border-0 shadow-lg">
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50">

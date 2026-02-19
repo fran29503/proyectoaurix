@@ -112,27 +112,27 @@ export default function PipelinePage() {
     <div className="space-y-6">
       {/* Header */}
       <FadeIn>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">{t.pipeline.title}</h1>
-            <p className="text-slate-500 mt-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{t.pipeline.title}</h1>
+            <p className="text-slate-500 mt-1 text-sm md:text-base hidden sm:block">
               {t.pipeline.subtitle}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3 flex-wrap">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleRefresh}
                 disabled={refreshing}
-                className="gap-2"
+                className="gap-2 rounded-xl"
               >
                 <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
-                {t.common.refresh}
+                <span className="hidden sm:inline">{t.common.refresh}</span>
               </Button>
             </motion.div>
-            <div className="flex items-center rounded-xl border p-1 bg-white">
+            <div className="hidden sm:flex items-center rounded-xl border p-1 bg-white">
               <Button variant="ghost" size="sm" className="bg-violet-50 text-violet-700 rounded-lg">
                 <LayoutGrid className="h-4 w-4" />
               </Button>
@@ -146,7 +146,7 @@ export default function PipelinePage() {
               <Button
                 size="sm"
                 onClick={() => setShowLeadModal(true)}
-                className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-lg shadow-violet-500/25"
+                className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-lg shadow-violet-500/25 rounded-xl"
               >
                 <Plus className="mr-2 h-4 w-4" />
                 {t.pipeline.addLead}
@@ -157,7 +157,7 @@ export default function PipelinePage() {
       </FadeIn>
 
       {/* Pipeline Stats */}
-      <div className="grid gap-4 md:grid-cols-5">
+      <div className="grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-5">
         {[
           { label: t.pipeline.totalInPipeline, value: stats.total, color: "slate" },
           { label: t.leadStatus.nuevo, value: stats.nuevo, color: "slate" },
@@ -188,12 +188,12 @@ export default function PipelinePage() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="flex items-center gap-3 p-4 rounded-xl bg-violet-50 border border-violet-200"
+        className="hidden sm:flex items-center gap-3 p-4 rounded-xl bg-violet-50 border border-violet-200"
       >
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500 text-white">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500 text-white flex-shrink-0">
           <LayoutGrid className="h-4 w-4" />
         </div>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-violet-900">
             {t.pipeline.dragDropEnabled}
           </p>
@@ -201,7 +201,7 @@ export default function PipelinePage() {
             {t.pipeline.dragDropInfo}
           </p>
         </div>
-        <Badge className="bg-violet-100 text-violet-700 border-violet-200">
+        <Badge className="bg-violet-100 text-violet-700 border-violet-200 flex-shrink-0">
           {leads.length} {t.pipeline.totalLeads}
         </Badge>
       </motion.div>

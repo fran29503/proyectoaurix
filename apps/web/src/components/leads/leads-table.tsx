@@ -338,8 +338,8 @@ export function LeadsTable({ data, onEdit, onDelete, onAssign }: LeadsTableProps
   return (
     <div className="space-y-4">
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-4">
-        <div className="relative flex-1 min-w-[200px] max-w-sm">
+      <div className="flex flex-wrap items-center gap-2 md:gap-4">
+        <div className="relative flex-1 min-w-[160px] max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder={t.leads.searchPlaceholder}
@@ -386,7 +386,7 @@ export function LeadsTable({ data, onEdit, onDelete, onAssign }: LeadsTableProps
       </div>
 
       {/* Table */}
-      <div className="rounded-lg border bg-white">
+      <div className="rounded-lg border bg-white overflow-x-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -424,8 +424,8 @@ export function LeadsTable({ data, onEdit, onDelete, onAssign }: LeadsTableProps
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+        <p className="text-xs sm:text-sm text-muted-foreground">
           {t.common.showing} {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}{" "}
           {t.common.to}{" "}
           {Math.min(
@@ -434,10 +434,11 @@ export function LeadsTable({ data, onEdit, onDelete, onAssign }: LeadsTableProps
           )}{" "}
           {t.common.of} {table.getFilteredRowModel().rows.length} {t.nav.leads.toLowerCase()}
         </p>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <Button
             variant="outline"
             size="icon"
+            className="h-8 w-8"
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
           >
@@ -446,17 +447,19 @@ export function LeadsTable({ data, onEdit, onDelete, onAssign }: LeadsTableProps
           <Button
             variant="outline"
             size="icon"
+            className="h-8 w-8"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="text-sm">
-            {t.common.page} {table.getState().pagination.pageIndex + 1} {t.common.of} {table.getPageCount()}
+          <span className="text-xs sm:text-sm px-1">
+            {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}
           </span>
           <Button
             variant="outline"
             size="icon"
+            className="h-8 w-8"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
@@ -465,6 +468,7 @@ export function LeadsTable({ data, onEdit, onDelete, onAssign }: LeadsTableProps
           <Button
             variant="outline"
             size="icon"
+            className="h-8 w-8"
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
           >

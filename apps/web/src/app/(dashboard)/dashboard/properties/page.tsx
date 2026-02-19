@@ -161,14 +161,14 @@ export default function PropertiesPage() {
     <div className="space-y-6">
       {/* Header */}
       <FadeIn>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">{t.properties.title}</h1>
-            <p className="text-slate-500 mt-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{t.properties.title}</h1>
+            <p className="text-slate-500 mt-1 text-sm md:text-base hidden sm:block">
               {t.properties.subtitle}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3 flex-wrap">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 variant="outline"
@@ -178,7 +178,7 @@ export default function PropertiesPage() {
                 className="gap-2 rounded-xl"
               >
                 <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
-                {t.common.refresh}
+                <span className="hidden sm:inline">{t.common.refresh}</span>
               </Button>
             </motion.div>
             <Button
@@ -202,9 +202,9 @@ export default function PropertiesPage() {
               }}
             >
               <Download className="mr-2 h-4 w-4" />
-              {t.common.export}
+              <span className="hidden sm:inline">{t.common.export}</span>
             </Button>
-            <div className="flex items-center rounded-xl border p-1 bg-white">
+            <div className="hidden sm:flex items-center rounded-xl border p-1 bg-white">
               <Button variant="ghost" size="sm" className="bg-violet-50 text-violet-700 rounded-lg">
                 <LayoutGrid className="h-4 w-4" />
               </Button>
@@ -229,7 +229,7 @@ export default function PropertiesPage() {
       </FadeIn>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-4">
         {[
           { label: t.properties.totalProperties, value: filteredProperties.length, color: "slate" },
           { label: t.properties.available, value: availableCount, color: "emerald" },
@@ -255,8 +255,8 @@ export default function PropertiesPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-4">
-        <div className="relative flex-1 min-w-[200px] max-w-sm">
+      <div className="flex flex-wrap items-center gap-2 md:gap-4">
+        <div className="relative flex-1 min-w-[160px] max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder={t.properties.searchPlaceholder}
@@ -269,7 +269,7 @@ export default function PropertiesPage() {
           <Filter className="h-4 w-4 text-muted-foreground" />
         </div>
         <Select value={marketFilter} onValueChange={setMarketFilter}>
-          <SelectTrigger className="w-[130px]">
+          <SelectTrigger className="w-[110px] md:w-[130px]">
             <SelectValue placeholder={t.leads.market} />
           </SelectTrigger>
           <SelectContent>
@@ -279,7 +279,7 @@ export default function PropertiesPage() {
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-[110px] md:w-[140px]">
             <SelectValue placeholder={t.properties.status} />
           </SelectTrigger>
           <SelectContent>
@@ -290,7 +290,7 @@ export default function PropertiesPage() {
           </SelectContent>
         </Select>
         <Select value={operationFilter} onValueChange={setOperationFilter}>
-          <SelectTrigger className="w-[130px]">
+          <SelectTrigger className="w-[110px] md:w-[130px]">
             <SelectValue placeholder={t.properties.operation} />
           </SelectTrigger>
           <SelectContent>
@@ -301,7 +301,7 @@ export default function PropertiesPage() {
           </SelectContent>
         </Select>
         <Select value={typeFilter} onValueChange={setTypeFilter}>
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-[110px] md:w-[140px]">
             <SelectValue placeholder={t.properties.propertyType} />
           </SelectTrigger>
           <SelectContent>
@@ -322,7 +322,7 @@ export default function PropertiesPage() {
         transition={{ delay: 0.2 }}
       >
         {transformedProperties.length > 0 ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {transformedProperties.map((property, index) => (
               <motion.div
                 key={property.id}

@@ -102,7 +102,7 @@ export default function SettingsPage() {
       {/* Header */}
       <FadeIn>
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">{t.settings?.title || "Settings"}</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{t.settings?.title || "Settings"}</h1>
           <p className="text-slate-500 mt-1">
             Manage your account and organization settings
           </p>

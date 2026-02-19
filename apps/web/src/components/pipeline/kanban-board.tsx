@@ -272,7 +272,7 @@ function KanbanColumn({ stage, leads, stageLabel }: KanbanColumnProps) {
   };
 
   return (
-    <div className="flex-shrink-0 w-72">
+    <div className="flex-shrink-0 w-64 md:w-72">
       {/* Column Header */}
       <motion.div
         className={cn(
@@ -507,14 +507,14 @@ export function KanbanBoard({ leads: initialLeads, onLeadUpdate }: KanbanBoardPr
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-4"
+          className="flex flex-wrap items-center gap-2 md:gap-4"
         >
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-slate-400" />
             <span className="text-sm font-medium text-slate-700">{t.common.filters}:</span>
           </div>
           <Select value={marketFilter} onValueChange={setMarketFilter}>
-            <SelectTrigger className="w-[130px] bg-white">
+            <SelectTrigger className="w-[110px] md:w-[130px] bg-white">
               <SelectValue placeholder={t.leads.market} />
             </SelectTrigger>
             <SelectContent className="bg-white z-50">
@@ -524,7 +524,7 @@ export function KanbanBoard({ leads: initialLeads, onLeadUpdate }: KanbanBoardPr
             </SelectContent>
           </Select>
           <Select value={segmentFilter} onValueChange={setSegmentFilter}>
-            <SelectTrigger className="w-[160px] bg-white">
+            <SelectTrigger className="w-[130px] md:w-[160px] bg-white">
               <SelectValue placeholder="Segment" />
             </SelectTrigger>
             <SelectContent className="bg-white z-50">

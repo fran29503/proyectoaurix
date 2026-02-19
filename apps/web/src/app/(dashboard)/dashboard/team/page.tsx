@@ -173,22 +173,22 @@ export default function TeamPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-navy-950">{t.team.title}</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl md:text-3xl font-bold text-navy-950">{t.team.title}</h1>
+          <p className="text-muted-foreground text-sm md:text-base">
             {t.team.members}
           </p>
         </div>
         <Can resource="team" action="create">
-          <Button size="sm" className="bg-copper-500 hover:bg-copper-600">
+          <Button size="sm" className="bg-copper-500 hover:bg-copper-600 w-fit">
             {t.common.add}
           </Button>
         </Can>
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-4">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
@@ -244,13 +244,13 @@ export default function TeamPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-2 md:gap-4">
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-medium">{t.common.filters}:</span>
         </div>
         <Select value={marketFilter} onValueChange={setMarketFilter}>
-          <SelectTrigger className="w-[130px]">
+          <SelectTrigger className="w-[110px] md:w-[130px]">
             <SelectValue placeholder={t.form.market} />
           </SelectTrigger>
           <SelectContent>
@@ -260,7 +260,7 @@ export default function TeamPage() {
           </SelectContent>
         </Select>
         <Select value={roleFilter} onValueChange={setRoleFilter}>
-          <SelectTrigger className="w-[150px]">
+          <SelectTrigger className="w-[120px] md:w-[150px]">
             <SelectValue placeholder={t.team.role} />
           </SelectTrigger>
           <SelectContent>
@@ -276,7 +276,7 @@ export default function TeamPage() {
 
       {/* Team Table */}
       <Card>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>

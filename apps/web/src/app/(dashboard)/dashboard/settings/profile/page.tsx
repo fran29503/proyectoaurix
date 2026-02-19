@@ -210,24 +210,22 @@ export default function ProfilePage() {
     <div className="space-y-6">
       {/* Header */}
       <FadeIn>
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <Link href="/dashboard/settings" className="text-slate-400 hover:text-slate-600">
-                <ArrowLeft className="h-5 w-5" />
-              </Link>
-              <h1 className="text-3xl font-bold text-slate-900">
-                {t.user?.profile || "Profile Settings"}
-              </h1>
-            </div>
-            <p className="text-slate-500 ml-8">
-              {t.profile?.subtitle || "Manage your account settings and preferences"}
-            </p>
+        <div>
+          <div className="flex items-center gap-3 mb-1">
+            <Link href="/dashboard/settings" className="text-slate-400 hover:text-slate-600">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
+              {t.user?.profile || "Profile Settings"}
+            </h1>
           </div>
+          <p className="text-slate-500 ml-8 text-sm md:text-base hidden sm:block">
+            {t.profile?.subtitle || "Manage your account settings and preferences"}
+          </p>
         </div>
       </FadeIn>
 
-      <div className="grid gap-6 lg:grid-cols-4">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-4">
         {/* Sidebar */}
         <div className="lg:col-span-1">
           <Card className="border-0 shadow-lg sticky top-6">

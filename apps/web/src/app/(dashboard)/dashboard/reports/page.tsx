@@ -113,18 +113,18 @@ function MetricCard({
   return (
     <motion.div variants={fadeIn}>
       <Card className="hover:shadow-md transition-shadow">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-navy-950/5">
-              <Icon className="h-5 w-5 text-navy-950" />
+        <CardContent className="p-4 md:p-6">
+          <div className="flex items-center justify-between mb-3 md:mb-4">
+            <div className="flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-lg bg-navy-950/5">
+              <Icon className="h-4 w-4 md:h-5 md:w-5 text-navy-950" />
             </div>
-            <div className={`flex items-center gap-1 text-sm ${isUp ? "text-emerald-600" : "text-red-600"}`}>
-              {isUp ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+            <div className={`flex items-center gap-1 text-xs md:text-sm ${isUp ? "text-emerald-600" : "text-red-600"}`}>
+              {isUp ? <TrendingUp className="h-3 w-3 md:h-4 md:w-4" /> : <TrendingDown className="h-3 w-3 md:h-4 md:w-4" />}
               {change}
             </div>
           </div>
-          <p className="text-2xl font-bold">{value}</p>
-          <p className="text-sm text-muted-foreground">{title}</p>
+          <p className="text-xl md:text-2xl font-bold truncate">{value}</p>
+          <p className="text-xs md:text-sm text-muted-foreground truncate">{title}</p>
         </CardContent>
       </Card>
     </motion.div>
@@ -185,14 +185,14 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-navy-950">{t.reports.title}</h1>
-          <p className="text-muted-foreground">{t.reports.subtitle}</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-navy-950">{t.reports.title}</h1>
+          <p className="text-muted-foreground text-sm md:text-base hidden sm:block">{t.reports.subtitle}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3 flex-wrap">
           <Select value={market} onValueChange={(v) => setMarket(v as MarketFilter)}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[110px] md:w-[140px]">
               <SelectValue placeholder={t.market.all} />
             </SelectTrigger>
             <SelectContent className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-lg z-50">
@@ -202,7 +202,7 @@ export default function ReportsPage() {
             </SelectContent>
           </Select>
           <Select value={period} onValueChange={(v) => setPeriod(v as PeriodFilter)}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[110px] md:w-[140px]">
               <SelectValue placeholder={t.reports.dateRange} />
             </SelectTrigger>
             <SelectContent className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-lg z-50">
@@ -225,7 +225,7 @@ export default function ReportsPage() {
             }}
           >
             <Download className="h-4 w-4 mr-2" />
-            Export PDF
+            <span className="hidden sm:inline">Export</span> PDF
           </Button>
         </div>
       </div>
@@ -256,7 +256,7 @@ export default function ReportsPage() {
           className="space-y-6"
         >
           {/* Summary Metrics */}
-          <motion.div variants={staggerContainer} className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <motion.div variants={staggerContainer} className="grid gap-3 md:gap-4 grid-cols-2 lg:grid-cols-4">
             <MetricCard
               title={t.reports.totalLeads}
               value={sm!.totalLeads.toLocaleString()}
@@ -289,24 +289,24 @@ export default function ReportsPage() {
 
           {/* Tabs */}
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList>
-              <TabsTrigger value="overview">{t.reports.overview}</TabsTrigger>
-              <TabsTrigger value="agents">{t.team.agents}</TabsTrigger>
-              <TabsTrigger value="channels">{t.reports.channels}</TabsTrigger>
-              <TabsTrigger value="properties">{t.nav.properties}</TabsTrigger>
+            <TabsList className="w-full sm:w-auto overflow-x-auto">
+              <TabsTrigger value="overview" className="text-xs sm:text-sm flex-1 sm:flex-initial">{t.reports.overview}</TabsTrigger>
+              <TabsTrigger value="agents" className="text-xs sm:text-sm flex-1 sm:flex-initial">{t.team.agents}</TabsTrigger>
+              <TabsTrigger value="channels" className="text-xs sm:text-sm flex-1 sm:flex-initial">{t.reports.channels}</TabsTrigger>
+              <TabsTrigger value="properties" className="text-xs sm:text-sm flex-1 sm:flex-initial">{t.nav.properties}</TabsTrigger>
             </TabsList>
 
             {/* === OVERVIEW TAB === */}
             <TabsContent value="overview" className="space-y-6">
-              <motion.div variants={fadeIn} className="grid gap-6 lg:grid-cols-2">
+              <motion.div variants={fadeIn} className="grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2">
                 <Card>
-                  <CardHeader>
+                  <CardHeader className="p-4 md:p-6">
                     <CardTitle className="text-base">{t.dashboard.leadTrends}</CardTitle>
-                    <CardDescription>{t.dashboard.leadTrendsDesc}</CardDescription>
+                    <CardDescription className="text-xs md:text-sm">{t.dashboard.leadTrendsDesc}</CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
                     <LeadTrendChart data={data.leadTrend} />
-                    <div className="flex items-center justify-center gap-6 mt-4 pt-4 border-t">
+                    <div className="flex items-center justify-center gap-4 md:gap-6 mt-4 pt-4 border-t">
                       <div className="flex items-center gap-2">
                         <div className="h-3 w-3 rounded-full bg-navy-950" />
                         <span className="text-sm text-muted-foreground">{t.market.dubai}</span>
@@ -383,7 +383,7 @@ export default function ReportsPage() {
 
             {/* === AGENTS TAB === */}
             <TabsContent value="agents" className="space-y-6">
-              <motion.div variants={fadeIn} className="grid gap-6 lg:grid-cols-3">
+              <motion.div variants={fadeIn} className="grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-3">
                 <Card className="lg:col-span-2">
                   <CardHeader>
                     <CardTitle className="text-base">{t.dashboard.agentPerformance}</CardTitle>
@@ -520,7 +520,7 @@ export default function ReportsPage() {
                 </Card>
               </motion.div>
 
-              <motion.div variants={fadeIn} className="grid gap-6 md:grid-cols-2">
+              <motion.div variants={fadeIn} className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2">
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-base">{t.reports.leadDistribution}</CardTitle>
@@ -606,7 +606,7 @@ export default function ReportsPage() {
               </motion.div>
 
               {/* Properties summary cards */}
-              <motion.div variants={fadeIn} className="grid gap-6 md:grid-cols-3">
+              <motion.div variants={fadeIn} className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
                 <Card>
                   <CardContent className="p-6">
                     <div className="flex items-center gap-3 mb-4">

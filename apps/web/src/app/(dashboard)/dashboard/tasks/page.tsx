@@ -77,7 +77,7 @@ function TaskItem({ task, showCompleted = false, onToggleStatus, onEdit, onDelet
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        "flex items-start gap-4 rounded-xl border p-4 transition-colors hover:shadow-sm",
+        "flex items-start gap-3 md:gap-4 rounded-xl border p-3 md:p-4 transition-colors hover:shadow-sm",
         isCompleted && "bg-slate-50",
         isOverdue && !isCompleted && "border-red-200 bg-red-50/50"
       )}
@@ -145,7 +145,7 @@ function TaskItem({ task, showCompleted = false, onToggleStatus, onEdit, onDelet
           </div>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-4 text-sm">
+        <div className="mt-2 md:mt-3 flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm">
           {/* Lead */}
           {task.lead && (
             <Link
@@ -299,12 +299,12 @@ export default function TasksPage() {
     <div className="space-y-6">
       {/* Header */}
       <FadeIn>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">{t.tasks.title}</h1>
-            <p className="text-slate-500 mt-1">{t.tasks.description}</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{t.tasks.title}</h1>
+            <p className="text-slate-500 mt-1 text-sm md:text-base hidden sm:block">{t.tasks.description}</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3 flex-wrap">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 variant="outline"
@@ -314,7 +314,7 @@ export default function TasksPage() {
                 className="gap-2 rounded-xl"
               >
                 <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
-                {t.common.refresh}
+                <span className="hidden sm:inline">{t.common.refresh}</span>
               </Button>
             </motion.div>
             <Button
@@ -338,7 +338,7 @@ export default function TasksPage() {
               }}
             >
               <Download className="mr-2 h-4 w-4" />
-              {t.common.export}
+              <span className="hidden sm:inline">{t.common.export}</span>
             </Button>
             <Can resource="tasks" action="create">
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -357,7 +357,7 @@ export default function TasksPage() {
       </FadeIn>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-4">
         {[
           { label: t.taskStatus.pending, value: pendingTasks.length, icon: Clock, color: "slate" },
           { label: t.tasks.overdue, value: overdueTasks.length, icon: AlertTriangle, color: overdueTasks.length > 0 ? "red" : "slate", alert: overdueTasks.length > 0 },
@@ -395,13 +395,13 @@ export default function TasksPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-2 md:gap-4">
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-medium">{t.tasks.filters}</span>
         </div>
         <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-[120px] md:w-[140px]">
             <SelectValue placeholder={t.tasks.priority} />
           </SelectTrigger>
           <SelectContent className="bg-white">
@@ -412,7 +412,7 @@ export default function TasksPage() {
           </SelectContent>
         </Select>
         <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
-          <SelectTrigger className="w-[160px]">
+          <SelectTrigger className="w-[130px] md:w-[160px]">
             <SelectValue placeholder={t.tasks.assignee} />
           </SelectTrigger>
           <SelectContent className="bg-white">
@@ -428,14 +428,14 @@ export default function TasksPage() {
 
       {/* Tasks Tabs */}
       <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="bg-slate-100 rounded-xl p-1">
-          <TabsTrigger value="pending" className="gap-2 rounded-lg">
+        <TabsList className="bg-slate-100 rounded-xl p-1 w-full sm:w-auto">
+          <TabsTrigger value="pending" className="gap-1 sm:gap-2 rounded-lg text-xs sm:text-sm flex-1 sm:flex-initial">
             {t.tasks.pending}
             <Badge variant="secondary" className="h-5 px-1.5">
               {filterTasks(pendingTasks).length}
             </Badge>
           </TabsTrigger>
-          <TabsTrigger value="overdue" className="gap-2 rounded-lg">
+          <TabsTrigger value="overdue" className="gap-1 sm:gap-2 rounded-lg text-xs sm:text-sm flex-1 sm:flex-initial">
             {t.tasks.overdue}
             {overdueTasks.length > 0 && (
               <Badge variant="destructive" className="h-5 px-1.5">
@@ -443,7 +443,7 @@ export default function TasksPage() {
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="completed" className="gap-2 rounded-lg">
+          <TabsTrigger value="completed" className="gap-1 sm:gap-2 rounded-lg text-xs sm:text-sm flex-1 sm:flex-initial">
             {t.tasks.completed}
             <Badge variant="secondary" className="h-5 px-1.5">
               {filterTasks(completedTasks).length}
