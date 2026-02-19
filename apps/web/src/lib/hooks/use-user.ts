@@ -36,10 +36,15 @@ export function useSignOut() {
 
   const signOut = async () => {
     setLoading(true);
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    setLoading(false);
-    window.location.href = "/login";
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch {
+      // Ignore errors — always redirect to login
+    } finally {
+      setLoading(false);
+      window.location.href = "/login";
+    }
   };
 
   return { signOut, loading };
