@@ -455,11 +455,11 @@ export default function ReportsPage() {
                                     variant="secondary"
                                     className={
                                       agent.rank === 1
-                                        ? "bg-amber-100 text-amber-700"
+                                        ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
                                         : agent.rank === 2
-                                        ? "bg-slate-200 text-slate-700"
+                                        ? "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
                                         : agent.rank === 3
-                                        ? "bg-amber-50 text-amber-600"
+                                        ? "bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400"
                                         : ""
                                     }
                                   >

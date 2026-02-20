@@ -204,8 +204,8 @@ export default function PropertiesPage() {
               <Download className="mr-2 h-4 w-4" />
               <span className="hidden sm:inline">{t.common.export}</span>
             </Button>
-            <div className="hidden sm:flex items-center rounded-xl border p-1 bg-white">
-              <Button variant="ghost" size="sm" className="bg-violet-50 text-violet-700 rounded-lg">
+            <div className="hidden sm:flex items-center rounded-xl border p-1 bg-white dark:bg-slate-800 dark:border-slate-700">
+              <Button variant="ghost" size="sm" className="bg-violet-50 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300 rounded-lg">
                 <LayoutGrid className="h-4 w-4" />
               </Button>
               <Button variant="ghost" size="sm" className="rounded-lg">

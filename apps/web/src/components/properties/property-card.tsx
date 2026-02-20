@@ -34,9 +34,9 @@ interface PropertyCardProps {
 }
 
 const statusColors: Record<string, { bg: string; text: string }> = {
-  disponible: { bg: "bg-emerald-100", text: "text-emerald-700" },
-  reservado: { bg: "bg-amber-100", text: "text-amber-700" },
-  vendido: { bg: "bg-slate-100", text: "text-slate-600" },
+  disponible: { bg: "bg-emerald-100 dark:bg-emerald-900/30", text: "text-emerald-700 dark:text-emerald-300" },
+  reservado: { bg: "bg-amber-100 dark:bg-amber-900/30", text: "text-amber-700 dark:text-amber-300" },
+  vendido: { bg: "bg-slate-100 dark:bg-slate-800", text: "text-slate-600 dark:text-slate-400" },
 };
 
 export function PropertyCard({ property, onEdit, onDelete }: PropertyCardProps) {
@@ -58,7 +58,7 @@ export function PropertyCard({ property, onEdit, onDelete }: PropertyCardProps) 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow group">
       {/* Image */}
-      <div className="relative h-48 bg-slate-200">
+      <div className="relative h-48 bg-slate-200 dark:bg-slate-700">
         <div className="absolute inset-0 flex items-center justify-center">
           <Building2 className="h-16 w-16 text-slate-400" />
         </div>
@@ -67,7 +67,7 @@ export function PropertyCard({ property, onEdit, onDelete }: PropertyCardProps) 
           <Badge className={cn("font-normal", statusStyle.bg, statusStyle.text)}>
             {statusLabels[property.status] || property.status}
           </Badge>
-          <Badge variant="secondary" className="bg-white/90">
+          <Badge variant="secondary" className="bg-white/90 dark:bg-slate-800/90">
             {operationLabels[property.operation] || property.operation}
           </Badge>
         </div>
@@ -104,7 +104,7 @@ export function PropertyCard({ property, onEdit, onDelete }: PropertyCardProps) 
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 rounded-lg hover:bg-slate-100">
+              <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -132,7 +132,7 @@ export function PropertyCard({ property, onEdit, onDelete }: PropertyCardProps) 
               {onDelete && (
                 <DropdownMenuItem
                   onClick={() => onDelete(property.id)}
-                  className="rounded-lg cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="rounded-lg cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   {t.common.delete}

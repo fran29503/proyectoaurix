@@ -54,9 +54,9 @@ import { useLanguage } from "@/lib/i18n";
 import { Can, useCurrentUser } from "@/lib/rbac";
 
 const priorityColors: Record<string, string> = {
-  high: "bg-red-100 text-red-700 border-red-200",
-  medium: "bg-amber-100 text-amber-700 border-amber-200",
-  low: "bg-slate-100 text-slate-600 border-slate-200",
+  high: "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800",
+  medium: "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800",
+  low: "bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700",
 };
 
 interface TaskItemProps {
@@ -182,7 +182,7 @@ function TaskItem({ task, showCompleted = false, onToggleStatus, onEdit, onDelet
           {task.assigned_user && (
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <Avatar className="h-5 w-5">
-                <AvatarFallback className="bg-slate-200 text-slate-600 text-[10px]">
+                <AvatarFallback className="bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300 text-[10px]">
                   {getInitials(task.assigned_user.full_name)}
                 </AvatarFallback>
               </Avatar>

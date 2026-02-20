@@ -132,8 +132,8 @@ export default function PipelinePage() {
                 <span className="hidden sm:inline">{t.common.refresh}</span>
               </Button>
             </motion.div>
-            <div className="hidden sm:flex items-center rounded-xl border p-1 bg-white">
-              <Button variant="ghost" size="sm" className="bg-violet-50 text-violet-700 rounded-lg">
+            <div className="hidden sm:flex items-center rounded-xl border p-1 bg-white dark:bg-slate-800 dark:border-slate-700">
+              <Button variant="ghost" size="sm" className="bg-violet-50 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300 rounded-lg">
                 <LayoutGrid className="h-4 w-4" />
               </Button>
               <Link href="/dashboard/leads">
@@ -188,20 +188,20 @@ export default function PipelinePage() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="hidden sm:flex items-center gap-3 p-4 rounded-xl bg-violet-50 border border-violet-200"
+        className="hidden sm:flex items-center gap-3 p-4 rounded-xl bg-violet-50 border border-violet-200 dark:bg-violet-900/20 dark:border-violet-800"
       >
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500 text-white flex-shrink-0">
           <LayoutGrid className="h-4 w-4" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-violet-900">
+          <p className="text-sm font-medium text-violet-900 dark:text-violet-200">
             {t.pipeline.dragDropEnabled}
           </p>
-          <p className="text-xs text-violet-700">
+          <p className="text-xs text-violet-700 dark:text-violet-400">
             {t.pipeline.dragDropInfo}
           </p>
         </div>
-        <Badge className="bg-violet-100 text-violet-700 border-violet-200 flex-shrink-0">
+        <Badge className="bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-900/30 dark:text-violet-300 dark:border-violet-800 flex-shrink-0">
           {leads.length} {t.pipeline.totalLeads}
         </Badge>
       </motion.div>

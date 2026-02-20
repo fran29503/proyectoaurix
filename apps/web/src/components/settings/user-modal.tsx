@@ -309,7 +309,7 @@ export function UserModal({
           <div className="space-y-4 py-4">
             {/* Error message */}
             {error && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 text-sm">
                 <AlertCircle className="h-4 w-4 flex-shrink-0" />
                 {error}
               </div>
@@ -433,8 +433,8 @@ export function UserModal({
                         className={cn(
                           "flex items-center justify-between p-2.5 rounded-xl border transition-all",
                           isEnabled
-                            ? "border-violet-200 bg-violet-50/50"
-                            : "border-slate-200 bg-slate-50/50",
+                            ? "border-violet-200 bg-violet-50/50 dark:border-violet-800 dark:bg-violet-900/20"
+                            : "border-slate-200 bg-slate-50/50 dark:border-slate-700 dark:bg-slate-800/50",
                           isOverridden && "ring-1 ring-amber-300"
                         )}
                       >

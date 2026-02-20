@@ -129,14 +129,14 @@ function KPICard({ kpi, index }: { kpi: KPIData; index: number }) {
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    nuevo: "bg-slate-100 text-slate-700 border-slate-200",
-    contactado: "bg-blue-50 text-blue-700 border-blue-200",
-    calificado: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    propuesta: "bg-violet-50 text-violet-700 border-violet-200",
-    negociacion: "bg-amber-50 text-amber-700 border-amber-200",
-    cerrado: "bg-green-50 text-green-700 border-green-200",
-    ganado: "bg-green-50 text-green-700 border-green-200",
-    perdido: "bg-red-50 text-red-700 border-red-200",
+    nuevo: "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700",
+    contactado: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800",
+    calificado: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800",
+    propuesta: "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-800",
+    negociacion: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800",
+    cerrado: "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800",
+    ganado: "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800",
+    perdido: "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800",
   };
 
   return (
@@ -292,7 +292,7 @@ export default function DashboardPage() {
               <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
               <span className="hidden sm:inline">{t.common.refresh}</span>
             </Button>
-            <Badge variant="outline" className="gap-1.5 px-3 py-1.5 border-emerald-200 bg-emerald-50 text-emerald-700">
+            <Badge variant="outline" className="gap-1.5 px-3 py-1.5 border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               {t.common.live}
             </Badge>
@@ -615,14 +615,14 @@ export default function DashboardPage() {
                     <Avatar className="h-9 w-9 md:h-10 md:w-10 ring-2 ring-white shadow-sm flex-shrink-0">
                       <AvatarFallback className={`text-xs font-semibold ${
                         alert.severity === "high"
-                          ? "bg-red-100 text-red-700"
-                          : "bg-amber-100 text-amber-700"
+                          ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+                          : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
                       }`}>
                         {getInitials(alert.leadName)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0">
-                      <p className="font-medium text-slate-900 text-sm md:text-base truncate">{alert.leadName}</p>
+                      <p className="font-medium text-slate-900 dark:text-slate-100 text-sm md:text-base truncate">{alert.leadName}</p>
                       <p className="text-xs md:text-sm text-slate-500 truncate">
                         {alert.market} · {t.dashboard.assignedTo} {alert.assignee}
                       </p>
@@ -632,8 +632,8 @@ export default function DashboardPage() {
                     <Badge
                       className={`flex items-center gap-1.5 text-xs ${
                         alert.severity === "high"
-                          ? "bg-red-100 text-red-700 border-red-200"
-                          : "bg-amber-100 text-amber-700 border-amber-200"
+                          ? "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800"
+                          : "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800"
                       }`}
                     >
                       <Clock className="h-3 w-3" />

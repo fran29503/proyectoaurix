@@ -61,13 +61,13 @@ export function DeleteLeadDialog({ open, onOpenChange, lead, onSuccess }: Delete
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="bg-white rounded-2xl">
+      <AlertDialogContent className="bg-white dark:bg-slate-900 rounded-2xl">
         <AlertDialogHeader>
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-              <AlertTriangle className="w-5 h-5 text-red-600" />
+            <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+              <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
             </div>
-            <AlertDialogTitle className="text-lg font-semibold text-slate-900">
+            <AlertDialogTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100">
               {t.leads.deleteLead}
             </AlertDialogTitle>
           </div>

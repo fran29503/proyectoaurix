@@ -176,7 +176,7 @@ export function ManagerOrAbove({ children, fallback = null }: ManagerOrAboveProp
 export function AccessDenied({ message }: { message?: string }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[400px] text-center p-8">
-      <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
+      <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
         <svg
           className="w-8 h-8 text-red-600"
           fill="none"

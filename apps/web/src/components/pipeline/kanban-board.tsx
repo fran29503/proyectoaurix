@@ -62,16 +62,16 @@ interface KanbanBoardProps {
 }
 
 const stageColors: Record<string, { bg: string; border: string; text: string; gradient: string }> = {
-  nuevo: { bg: "bg-slate-50", border: "border-slate-200", text: "text-slate-700", gradient: "from-slate-400 to-slate-600" },
-  contactado: { bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-700", gradient: "from-blue-400 to-blue-600" },
-  calificado: { bg: "bg-cyan-50", border: "border-cyan-200", text: "text-cyan-700", gradient: "from-cyan-400 to-cyan-600" },
-  meeting_programado: { bg: "bg-violet-50", border: "border-violet-200", text: "text-violet-700", gradient: "from-violet-400 to-violet-600" },
-  meeting_realizado: { bg: "bg-purple-50", border: "border-purple-200", text: "text-purple-700", gradient: "from-purple-400 to-purple-600" },
-  oferta_reserva: { bg: "bg-amber-50", border: "border-amber-200", text: "text-amber-700", gradient: "from-amber-400 to-amber-600" },
-  negociacion: { bg: "bg-orange-50", border: "border-orange-200", text: "text-orange-700", gradient: "from-orange-400 to-orange-600" },
-  cerrado_ganado: { bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-700", gradient: "from-emerald-400 to-emerald-600" },
-  cerrado_perdido: { bg: "bg-red-50", border: "border-red-200", text: "text-red-700", gradient: "from-red-400 to-red-600" },
-  dormido: { bg: "bg-gray-50", border: "border-gray-200", text: "text-gray-600", gradient: "from-gray-400 to-gray-600" },
+  nuevo: { bg: "bg-slate-50 dark:bg-slate-800", border: "border-slate-200 dark:border-slate-700", text: "text-slate-700 dark:text-slate-300", gradient: "from-slate-400 to-slate-600" },
+  contactado: { bg: "bg-blue-50 dark:bg-blue-900/20", border: "border-blue-200 dark:border-blue-800", text: "text-blue-700 dark:text-blue-300", gradient: "from-blue-400 to-blue-600" },
+  calificado: { bg: "bg-cyan-50 dark:bg-cyan-900/20", border: "border-cyan-200 dark:border-cyan-800", text: "text-cyan-700 dark:text-cyan-300", gradient: "from-cyan-400 to-cyan-600" },
+  meeting_programado: { bg: "bg-violet-50 dark:bg-violet-900/20", border: "border-violet-200 dark:border-violet-800", text: "text-violet-700 dark:text-violet-300", gradient: "from-violet-400 to-violet-600" },
+  meeting_realizado: { bg: "bg-purple-50 dark:bg-purple-900/20", border: "border-purple-200 dark:border-purple-800", text: "text-purple-700 dark:text-purple-300", gradient: "from-purple-400 to-purple-600" },
+  oferta_reserva: { bg: "bg-amber-50 dark:bg-amber-900/20", border: "border-amber-200 dark:border-amber-800", text: "text-amber-700 dark:text-amber-300", gradient: "from-amber-400 to-amber-600" },
+  negociacion: { bg: "bg-orange-50 dark:bg-orange-900/20", border: "border-orange-200 dark:border-orange-800", text: "text-orange-700 dark:text-orange-300", gradient: "from-orange-400 to-orange-600" },
+  cerrado_ganado: { bg: "bg-emerald-50 dark:bg-emerald-900/20", border: "border-emerald-200 dark:border-emerald-800", text: "text-emerald-700 dark:text-emerald-300", gradient: "from-emerald-400 to-emerald-600" },
+  cerrado_perdido: { bg: "bg-red-50 dark:bg-red-900/20", border: "border-red-200 dark:border-red-800", text: "text-red-700 dark:text-red-300", gradient: "from-red-400 to-red-600" },
+  dormido: { bg: "bg-gray-50 dark:bg-gray-800", border: "border-gray-200 dark:border-gray-700", text: "text-gray-600 dark:text-gray-400", gradient: "from-gray-400 to-gray-600" },
 };
 
 const intentDots: Record<string, string> = {
@@ -137,15 +137,15 @@ function LeadCard({ lead, dragHandleProps, isDragging, isOverlay }: LeadCardProp
     >
       <Card
         className={cn(
-          "p-3 cursor-pointer group bg-white border-slate-200",
-          "hover:shadow-lg hover:border-violet-200 transition-all duration-200",
+          "p-3 cursor-pointer group bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700",
+          "hover:shadow-lg hover:border-violet-200 dark:hover:border-violet-800 transition-all duration-200",
           isDragging && "shadow-2xl border-violet-400 ring-2 ring-violet-400/20",
           isOverlay && "shadow-2xl rotate-2 scale-105"
         )}
       >
         <div className="flex items-start justify-between mb-2">
           <div className="flex items-center gap-2">
-            <Avatar className="h-8 w-8 ring-2 ring-white shadow-sm">
+            <Avatar className="h-8 w-8 ring-2 ring-white dark:ring-slate-800 shadow-sm">
               <AvatarFallback className="bg-gradient-to-br from-slate-700 to-slate-900 text-white text-xs font-semibold">
                 {getInitials(lead.fullName)}
               </AvatarFallback>
@@ -157,7 +157,7 @@ function LeadCard({ lead, dragHandleProps, isDragging, isOverlay }: LeadCardProp
               >
                 {lead.fullName}
               </Link>
-              <div className="flex items-center gap-1 text-xs text-slate-500">
+              <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
                 {lead.market === "dubai" ? "🇦🇪" : "🇺🇸"}
                 <span>{lead.countryResidence}</span>
               </div>
@@ -166,7 +166,7 @@ function LeadCard({ lead, dragHandleProps, isDragging, isOverlay }: LeadCardProp
           <div className="flex items-center gap-1">
             <div
               {...dragHandleProps}
-              className="opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing p-1 hover:bg-slate-100 rounded"
+              className="opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
             >
               <GripVertical className="h-4 w-4 text-slate-400" />
             </div>
@@ -180,7 +180,7 @@ function LeadCard({ lead, dragHandleProps, isDragging, isOverlay }: LeadCardProp
                   <MoreHorizontal className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white z-50">
+              <DropdownMenuContent align="end" className="bg-white dark:bg-slate-800 z-50">
                 <DropdownMenuItem asChild>
                   <Link href={`/dashboard/leads/${lead.id}`}>
                     <User className="mr-2 h-3 w-3" />
@@ -202,18 +202,18 @@ function LeadCard({ lead, dragHandleProps, isDragging, isOverlay }: LeadCardProp
 
         {/* Interest */}
         {lead.interestZone && (
-          <div className="text-xs text-slate-500 mb-2 truncate">
+          <div className="text-xs text-slate-500 dark:text-slate-400 mb-2 truncate">
             📍 {lead.interestZone} {lead.interestType && `• ${lead.interestType}`}
           </div>
         )}
 
         {/* Budget */}
-        <div className="text-sm font-semibold text-slate-900 mb-2">
+        <div className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-2">
           {formatBudgetRange(lead.budgetMin, lead.budgetMax, lead.budgetCurrency)}
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-700">
           <div className="flex items-center gap-2">
             {lead.intent && (
               <div className="flex items-center gap-1">
@@ -230,9 +230,9 @@ function LeadCard({ lead, dragHandleProps, isDragging, isOverlay }: LeadCardProp
 
         {/* Assigned */}
         {lead.assignedTo && (
-          <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-slate-100">
+          <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-slate-100 dark:border-slate-700">
             <Avatar className="h-5 w-5">
-              <AvatarFallback className="bg-violet-100 text-violet-700 text-[10px] font-semibold">
+              <AvatarFallback className="bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300 text-[10px] font-semibold">
                 {getInitials(lead.assignedTo.fullName)}
               </AvatarFallback>
             </Avatar>
@@ -291,7 +291,7 @@ function KanbanColumn({ stage, leads, stageLabel }: KanbanColumnProps) {
               variant="secondary"
               className={cn(
                 "h-5 px-1.5 text-xs font-semibold",
-                isOver && "bg-violet-100 text-violet-700"
+                isOver && "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
               )}
             >
               {leads.length}
@@ -314,7 +314,7 @@ function KanbanColumn({ stage, leads, stageLabel }: KanbanColumnProps) {
           ref={setNodeRef}
           className={cn(
             "space-y-2 min-h-[200px] p-2 rounded-xl transition-all duration-200",
-            isOver && "bg-violet-50/50 border-2 border-dashed border-violet-300"
+            isOver && "bg-violet-50/50 dark:bg-violet-900/10 border-2 border-dashed border-violet-300 dark:border-violet-700"
           )}
         >
           <AnimatePresence mode="popLayout">
@@ -328,7 +328,7 @@ function KanbanColumn({ stage, leads, stageLabel }: KanbanColumnProps) {
               animate={{ opacity: 1 }}
               className={cn(
                 "flex items-center justify-center h-24 border-2 border-dashed rounded-xl text-sm",
-                isOver ? "border-violet-300 bg-violet-50 text-violet-600" : "border-slate-200 text-slate-400"
+                isOver ? "border-violet-300 bg-violet-50 text-violet-600 dark:border-violet-700 dark:bg-violet-900/20 dark:text-violet-400" : "border-slate-200 dark:border-slate-700 text-slate-400"
               )}
             >
               {isOver ? t.pipeline.dropHere : t.pipeline.noLeadsInStage}

@@ -81,14 +81,14 @@ export function ChannelPieChart({ data: propData }: ChannelPieChartProps = {}) {
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.05 }}
-            className="flex items-center justify-between hover:bg-slate-50 p-1.5 rounded-lg transition-colors cursor-pointer"
+            className="flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 p-1.5 rounded-lg transition-colors cursor-pointer"
           >
             <div className="flex items-center gap-2.5">
               <div
                 className="h-3 w-3 rounded-full shadow-sm"
                 style={{ backgroundColor: item.color }}
               />
-              <span className="text-xs font-medium text-slate-700">{item.name}</span>
+              <span className="text-xs font-medium text-slate-700 dark:text-slate-300">{item.name}</span>
             </div>
             <span className="text-xs font-semibold text-slate-900">
               {Math.round((item.value / total) * 100)}%

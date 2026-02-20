@@ -110,9 +110,9 @@ export function AssignLeadDialog({ open, onOpenChange, lead, onSuccess }: Assign
   );
 
   const roleColors: Record<string, string> = {
-    admin: "bg-violet-100 text-violet-700",
-    manager: "bg-blue-100 text-blue-700",
-    agent: "bg-slate-100 text-slate-700",
+    admin: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300",
+    manager: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+    agent: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
   };
 
   return (

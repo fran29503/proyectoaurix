@@ -87,15 +87,15 @@ export function ConversionFunnel({ data: propData, overallConversionRate }: Conv
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="pt-4 mt-4 border-t border-slate-100"
+        className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800"
       >
-        <div className="flex justify-between items-center p-3 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100">
-          <span className="text-sm font-medium text-slate-700">Overall Conversion</span>
-          <span className="text-lg font-bold text-emerald-600">{overallConversionRate || "2.0%"}</span>
+        <div className="flex justify-between items-center p-3 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border border-emerald-100 dark:border-emerald-800">
+          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Overall Conversion</span>
+          <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{overallConversionRate || "2.0%"}</span>
         </div>
-        <div className="flex justify-between items-center mt-2 p-3 rounded-xl bg-slate-50">
-          <span className="text-sm text-slate-600">Avg. Time to Close</span>
-          <span className="text-sm font-semibold text-slate-900">45 days</span>
+        <div className="flex justify-between items-center mt-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+          <span className="text-sm text-slate-600 dark:text-slate-400">Avg. Time to Close</span>
+          <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">45 days</span>
         </div>
       </motion.div>
     </div>

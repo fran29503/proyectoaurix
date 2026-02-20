@@ -44,11 +44,11 @@ import { useLanguage } from "@/lib/i18n";
 import { Can, ManagerOrAbove } from "@/lib/rbac";
 
 const roleColors: Record<string, string> = {
-  admin: "bg-purple-100 text-purple-700",
-  manager: "bg-blue-100 text-blue-700",
-  team_lead: "bg-cyan-100 text-cyan-700",
-  agent: "bg-slate-100 text-slate-700",
-  backoffice: "bg-gray-100 text-gray-600",
+  admin: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
+  manager: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+  team_lead: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300",
+  agent: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+  backoffice: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
 };
 
 function TeamMemberRow({ member }: { member: TeamMember }) {
@@ -87,7 +87,7 @@ function TeamMemberRow({ member }: { member: TeamMember }) {
         <span className="text-lg">{member.market === "dubai" ? "🇦🇪" : member.market === "usa" ? "🇺🇸" : "-"}</span>
       </TableCell>
       <TableCell>
-        <Badge variant={member.is_active ? "default" : "secondary"} className={member.is_active ? "bg-emerald-100 text-emerald-700" : ""}>
+        <Badge variant={member.is_active ? "default" : "secondary"} className={member.is_active ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300" : ""}>
           {member.is_active ? t.team.active : t.team.inactive}
         </Badge>
       </TableCell>

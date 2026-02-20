@@ -451,7 +451,7 @@ export function PropertyModal({ open, onOpenChange, property, onSuccess }: Prope
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm"
+              className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 text-sm"
             >
               {error}
             </motion.div>
@@ -459,7 +459,7 @@ export function PropertyModal({ open, onOpenChange, property, onSuccess }: Prope
         </form>
 
         {/* Footer */}
-        <div className="p-6 pt-4 border-t bg-slate-50 flex items-center justify-end gap-3">
+        <div className="p-6 pt-4 border-t bg-slate-50 dark:bg-slate-800/50 flex items-center justify-end gap-3">
           <Button
             type="button"
             variant="outline"
