@@ -94,8 +94,7 @@ proyecto AURIX/
 │       │   │   │   └── translations/
 │       │   │   │       ├── en.ts
 │       │   │   │       ├── es.ts
-│       │   │   │       ├── ar.ts     # RTL support
-│       │   │   │       └── fr.ts
+│       │   │   │       └── ar.ts     # RTL support
 │       │   │   └── data/             # Datos mock/estáticos
 │       │   └── middleware.ts         # Auth middleware
 │       ├── supabase/
@@ -198,6 +197,8 @@ backoffice: leads (view all), properties (all), tasks (own)
 | es | Español | LTR |
 | ar | العربية (Arabic) | RTL |
 
+> **Nota:** Francés (fr) fue removido del scope del proyecto.
+
 ### Uso
 ```typescript
 import { useLanguage } from "@/lib/i18n";
@@ -227,7 +228,7 @@ Ubicado en el header, dentro del menú de usuario.
 - [x] Sistema de Autenticación completo
 - [x] Multi-tenancy
 - [x] Sistema RBAC completo (frontend)
-- [x] Sistema i18n (3 idiomas: EN, ES, AR + RTL)
+- [x] Sistema i18n (3 idiomas: EN, ES, AR + RTL support)
 - [x] User Management (Settings > Users)
 - [x] Profile Settings (personal info, notifications, security, appearance)
 - [x] Audit Log (tracking de acciones)

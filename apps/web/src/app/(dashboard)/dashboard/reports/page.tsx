@@ -542,17 +542,17 @@ export default function ReportsPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {bestConverter && bestConverter.closings > 0 && (
-                      <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200">
-                        <p className="text-sm font-medium text-emerald-900">{t.reports.topPerformer}</p>
-                        <p className="text-xs text-emerald-700 mt-1">
+                      <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800">
+                        <p className="text-sm font-medium text-emerald-900 dark:text-emerald-200">{t.reports.topPerformer}</p>
+                        <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-1">
                           {bestConverter.channel} {t.reports.topPerformerDesc} ({bestConverter.conversionRate.toFixed(1)}%)
                         </p>
                       </div>
                     )}
                     {topChannel && (
-                      <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
-                        <p className="text-sm font-medium text-blue-900">{t.reports.mostVolume}</p>
-                        <p className="text-xs text-blue-700 mt-1">
+                      <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 dark:bg-blue-900/20 dark:border-blue-800">
+                        <p className="text-sm font-medium text-blue-900 dark:text-blue-200">{t.reports.mostVolume}</p>
+                        <p className="text-xs text-blue-700 dark:text-blue-400 mt-1">
                           {topChannel.channel} {t.reports.mostVolumeDesc} ({topChannel.leads} {t.reports.leads.toLowerCase()})
                         </p>
                       </div>
