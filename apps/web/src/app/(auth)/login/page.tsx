@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { logAuditAction } from "@/lib/queries/audit";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,7 +36,12 @@ export default function LoginPage() {
       }
 
       if (data?.user) {
-        console.log("Login successful:", data.user.email);
+        // Log login event to audit trail (fire-and-forget)
+        logAuditAction({
+          action: "login",
+          resource: "user",
+          resourceName: data.user.email || "Unknown",
+        });
         window.location.href = "/dashboard";
       }
     } catch (err) {

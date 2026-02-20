@@ -99,13 +99,18 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
       const supabase = createClient();
 
-      // Check for demo mode
-      const isDemoModeCookie = document.cookie.includes("demo_mode=true");
-      if (isDemoModeCookie) {
-        setIsDemoMode(true);
-        setUser(DEMO_USER);
-        setLoading(false);
-        return;
+      // Check for demo mode via server endpoint (cookie is httpOnly)
+      try {
+        const res = await fetch("/api/auth/status");
+        const { isDemoMode: isDemo } = await res.json();
+        if (isDemo) {
+          setIsDemoMode(true);
+          setUser(DEMO_USER);
+          setLoading(false);
+          return;
+        }
+      } catch {
+        // If status check fails, continue with normal auth
       }
 
       // Get authenticated user from Supabase Auth

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
+
 export function useUser() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -36,17 +37,11 @@ export function useSignOut() {
 
   const signOut = async () => {
     setLoading(true);
-    try {
-      const supabase = createClient();
-      await supabase.auth.signOut();
-    } catch {
-      // Ignore errors — always redirect to login
-    } finally {
-      // Clear demo mode cookie if present
-      document.cookie = "demo_mode=; path=/; max-age=0";
-      setLoading(false);
-      window.location.href = "/login";
-    }
+    // Use server-side logout endpoint which handles:
+    // - Supabase auth.signOut()
+    // - Clearing httpOnly demo_mode cookie
+    // - Redirect to /login
+    window.location.href = "/api/logout";
   };
 
   return { signOut, loading };
