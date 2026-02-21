@@ -136,6 +136,8 @@ export function Header() {
   };
 
   const unreadCount = notifications.filter(n => n.unread).length;
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const mobileSearchRef = useRef<HTMLInputElement>(null);
 
   return (
     <motion.header
@@ -215,10 +217,69 @@ export function Header() {
           </AnimatePresence>
         </div>
 
-        {/* Mobile search icon */}
-        <Button variant="ghost" size="icon" className="sm:hidden h-9 w-9 flex-shrink-0 rounded-xl" onClick={() => searchInputRef.current?.focus()}>
-          <Search className="h-4 w-4" />
-        </Button>
+        {/* Mobile search */}
+        {!mobileSearchOpen ? (
+          <Button variant="ghost" size="icon" className="sm:hidden h-9 w-9 flex-shrink-0 rounded-xl" onClick={() => {
+            setMobileSearchOpen(true);
+            setTimeout(() => mobileSearchRef.current?.focus(), 100);
+          }}>
+            <Search className="h-4 w-4" />
+          </Button>
+        ) : (
+          <div className="sm:hidden fixed inset-0 z-50 bg-white dark:bg-slate-900 p-3 flex flex-col">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Input
+                  ref={mobileSearchRef}
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  placeholder={t.common.search}
+                  className="h-10 pl-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl"
+                />
+              </div>
+              <Button variant="ghost" size="sm" className="flex-shrink-0 rounded-xl" onClick={() => {
+                setMobileSearchOpen(false);
+                setSearchQuery("");
+                setSearchResults([]);
+              }}>
+                {t.common.cancel}
+              </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              {searching ? (
+                <div className="p-4 text-center text-sm text-slate-400">{t.common.loading}</div>
+              ) : searchResults.length > 0 ? (
+                searchResults.map((result) => {
+                  const Icon = typeIcons[result.type] || Search;
+                  return (
+                    <button
+                      key={`m-${result.type}-${result.id}`}
+                      onClick={() => {
+                        router.push(result.href);
+                        setMobileSearchOpen(false);
+                        setSearchQuery("");
+                        setSearchResults([]);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                    >
+                      <div className={`flex items-center justify-center w-8 h-8 rounded-lg ${typeColors[result.type]}`}>
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">{result.title}</p>
+                        <p className="text-xs text-slate-500 truncate">{result.subtitle}</p>
+                      </div>
+                    </button>
+                  );
+                })
+              ) : searchQuery.length >= 2 ? (
+                <div className="p-4 text-center text-sm text-slate-400">{t.common.noResults}</div>
+              ) : null}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Right side */}
