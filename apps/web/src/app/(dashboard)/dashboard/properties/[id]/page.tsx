@@ -31,6 +31,8 @@ import {
   type Property,
   type InterestedLead,
 } from "@/lib/queries/properties";
+import { PropertyModal } from "@/components/properties/property-modal";
+import { toast } from "sonner";
 import { useLanguage } from "@/lib/i18n";
 import { motion } from "framer-motion";
 
@@ -53,22 +55,24 @@ export default function PropertyDetailPage() {
   const [interestedLeads, setInterestedLeads] = useState<InterestedLead[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  const fetchData = async () => {
+    setLoading(true);
+    const prop = await getPropertyById(id);
+    if (!prop) {
+      setNotFound(true);
+      setLoading(false);
+      return;
+    }
+    setProperty(prop);
+
+    const leads = await getInterestedLeads(prop.zone, prop.market);
+    setInterestedLeads(leads);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      const prop = await getPropertyById(id);
-      if (!prop) {
-        setNotFound(true);
-        setLoading(false);
-        return;
-      }
-      setProperty(prop);
-
-      const leads = await getInterestedLeads(prop.zone, prop.market);
-      setInterestedLeads(leads);
-      setLoading(false);
-    }
     fetchData();
   }, [id]);
 
@@ -129,15 +133,22 @@ export default function PropertyDetailPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              navigator.clipboard.writeText(window.location.href);
+              toast.success("Link copied to clipboard");
+            }}
+          >
             <Share2 className="mr-2 h-4 w-4" />
             {t.common.share}
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={() => window.print()}>
             <FileText className="mr-2 h-4 w-4" />
             {t.common.pdf}
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={() => setShowEditModal(true)}>
             <Edit className="mr-2 h-4 w-4" />
             {t.common.edit}
           </Button>
@@ -357,11 +368,18 @@ export default function PropertyDetailPage() {
           {/* Quick Actions */}
           <Card>
             <CardContent className="p-4 space-y-2">
-              <Button className="w-full bg-copper-500 hover:bg-copper-600">
+              <Button className="w-full bg-copper-500 hover:bg-copper-600" onClick={() => window.print()}>
                 <FileText className="mr-2 h-4 w-4" />
                 {t.properties.generatePdf}
               </Button>
-              <Button variant="outline" className="w-full">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  toast.success("Link copied to clipboard");
+                }}
+              >
                 <Share2 className="mr-2 h-4 w-4" />
                 {t.properties.shareWithLead}
               </Button>
@@ -369,6 +387,13 @@ export default function PropertyDetailPage() {
           </Card>
         </div>
       </div>
+
+      <PropertyModal
+        open={showEditModal}
+        onOpenChange={setShowEditModal}
+        property={property}
+        onSuccess={fetchData}
+      />
     </motion.div>
   );
 }

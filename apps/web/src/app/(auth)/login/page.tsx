@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, ArrowRight, Sparkles, Shield, Zap, ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -231,12 +232,12 @@ export default function LoginPage() {
                 <Label htmlFor="password" className="text-slate-700 font-medium">
                   Password
                 </Label>
-                <button
-                  type="button"
+                <Link
+                  href="/forgot-password"
                   className="text-sm text-violet-600 hover:text-violet-700 font-medium transition-colors"
                 >
                   Forgot password?
-                </button>
+                </Link>
               </div>
               <div className="relative">
                 <Input

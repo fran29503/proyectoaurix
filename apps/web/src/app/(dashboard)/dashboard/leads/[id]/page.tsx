@@ -364,24 +364,41 @@ export default function LeadDetailPage() {
       </FadeIn>
 
       {/* Quick Actions */}
-      <div className="flex gap-2">
-        <Button variant="outline" size="sm" className="rounded-xl">
-          <Phone className="mr-2 h-4 w-4" />
-          Call
-        </Button>
-        <Button variant="outline" size="sm" className="rounded-xl">
-          <MessageSquare className="mr-2 h-4 w-4" />
-          WhatsApp
-        </Button>
-        {lead.email && (
-          <Button variant="outline" size="sm" className="rounded-xl">
-            <Mail className="mr-2 h-4 w-4" />
-            Email
+      <div className="flex flex-wrap gap-2">
+        {lead.phone && (
+          <Button variant="outline" size="sm" className="rounded-xl" asChild>
+            <a href={`tel:${lead.phone}`}>
+              <Phone className="mr-2 h-4 w-4" />
+              {t.common.call}
+            </a>
           </Button>
         )}
-        <Button variant="outline" size="sm" className="rounded-xl">
+        {lead.phone && (
+          <Button variant="outline" size="sm" className="rounded-xl" asChild>
+            <a href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, "")}`} target="_blank" rel="noopener noreferrer">
+              <MessageSquare className="mr-2 h-4 w-4" />
+              WhatsApp
+            </a>
+          </Button>
+        )}
+        {lead.email && (
+          <Button variant="outline" size="sm" className="rounded-xl" asChild>
+            <a href={`mailto:${lead.email}`}>
+              <Mail className="mr-2 h-4 w-4" />
+              {t.common.email}
+            </a>
+          </Button>
+        )}
+        <Button
+          variant="outline"
+          size="sm"
+          className="rounded-xl"
+          onClick={() => {
+            setShowTaskModal(true);
+          }}
+        >
           <Calendar className="mr-2 h-4 w-4" />
-          Schedule Meeting
+          {t.taskType.meeting}
         </Button>
       </div>
 
