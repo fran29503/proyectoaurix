@@ -61,17 +61,22 @@ interface KanbanBoardProps {
   onLeadUpdate?: (leadId: string, newStatus: LeadStatusType) => void;
 }
 
-const stageColors: Record<string, { bg: string; border: string; text: string; gradient: string }> = {
-  nuevo: { bg: "bg-slate-50 dark:bg-slate-800", border: "border-slate-200 dark:border-slate-700", text: "text-slate-700 dark:text-slate-300", gradient: "from-slate-400 to-slate-600" },
-  contactado: { bg: "bg-blue-50 dark:bg-blue-900/20", border: "border-blue-200 dark:border-blue-800", text: "text-blue-700 dark:text-blue-300", gradient: "from-blue-400 to-blue-600" },
-  calificado: { bg: "bg-cyan-50 dark:bg-cyan-900/20", border: "border-cyan-200 dark:border-cyan-800", text: "text-cyan-700 dark:text-cyan-300", gradient: "from-cyan-400 to-cyan-600" },
-  meeting_programado: { bg: "bg-violet-50 dark:bg-violet-900/20", border: "border-violet-200 dark:border-violet-800", text: "text-violet-700 dark:text-violet-300", gradient: "from-violet-400 to-violet-600" },
-  meeting_realizado: { bg: "bg-purple-50 dark:bg-purple-900/20", border: "border-purple-200 dark:border-purple-800", text: "text-purple-700 dark:text-purple-300", gradient: "from-purple-400 to-purple-600" },
-  oferta_reserva: { bg: "bg-amber-50 dark:bg-amber-900/20", border: "border-amber-200 dark:border-amber-800", text: "text-amber-700 dark:text-amber-300", gradient: "from-amber-400 to-amber-600" },
-  negociacion: { bg: "bg-orange-50 dark:bg-orange-900/20", border: "border-orange-200 dark:border-orange-800", text: "text-orange-700 dark:text-orange-300", gradient: "from-orange-400 to-orange-600" },
-  cerrado_ganado: { bg: "bg-emerald-50 dark:bg-emerald-900/20", border: "border-emerald-200 dark:border-emerald-800", text: "text-emerald-700 dark:text-emerald-300", gradient: "from-emerald-400 to-emerald-600" },
-  cerrado_perdido: { bg: "bg-red-50 dark:bg-red-900/20", border: "border-red-200 dark:border-red-800", text: "text-red-700 dark:text-red-300", gradient: "from-red-400 to-red-600" },
-  dormido: { bg: "bg-gray-50 dark:bg-gray-800", border: "border-gray-200 dark:border-gray-700", text: "text-gray-600 dark:text-gray-400", gradient: "from-gray-400 to-gray-600" },
+const stageColors: Record<string, {
+  light: { bg: string; border: string; text: string };
+  dark: { bg: string; border: string; text: string };
+  gradient: string;
+  dot: string;
+}> = {
+  nuevo:             { light: { bg: "#f8fafc", border: "#e2e8f0", text: "#334155" }, dark: { bg: "#1e293b", border: "#334155", text: "#cbd5e1" }, gradient: "from-slate-400 to-slate-600", dot: "#94a3b8" },
+  contactado:        { light: { bg: "#eff6ff", border: "#bfdbfe", text: "#1d4ed8" }, dark: { bg: "rgba(30,58,138,0.2)", border: "#1e3a5f", text: "#93c5fd" }, gradient: "from-blue-400 to-blue-600", dot: "#3b82f6" },
+  calificado:        { light: { bg: "#ecfeff", border: "#a5f3fc", text: "#0e7490" }, dark: { bg: "rgba(22,78,99,0.2)", border: "#164e63", text: "#67e8f9" }, gradient: "from-cyan-400 to-cyan-600", dot: "#06b6d4" },
+  meeting_programado:{ light: { bg: "#f5f3ff", border: "#c4b5fd", text: "#6d28d9" }, dark: { bg: "rgba(76,29,149,0.2)", border: "#4c1d95", text: "#c4b5fd" }, gradient: "from-violet-400 to-violet-600", dot: "#8b5cf6" },
+  meeting_realizado: { light: { bg: "#faf5ff", border: "#d8b4fe", text: "#7e22ce" }, dark: { bg: "rgba(88,28,135,0.2)", border: "#581c87", text: "#d8b4fe" }, gradient: "from-purple-400 to-purple-600", dot: "#a855f7" },
+  oferta_reserva:    { light: { bg: "#fffbeb", border: "#fcd34d", text: "#b45309" }, dark: { bg: "rgba(120,53,15,0.2)", border: "#78350f", text: "#fcd34d" }, gradient: "from-amber-400 to-amber-600", dot: "#f59e0b" },
+  negociacion:       { light: { bg: "#fff7ed", border: "#fdba74", text: "#c2410c" }, dark: { bg: "rgba(124,45,18,0.2)", border: "#7c2d12", text: "#fdba74" }, gradient: "from-orange-400 to-orange-600", dot: "#f97316" },
+  cerrado_ganado:    { light: { bg: "#ecfdf5", border: "#6ee7b7", text: "#047857" }, dark: { bg: "rgba(6,78,59,0.2)", border: "#064e3b", text: "#6ee7b7" }, gradient: "from-emerald-400 to-emerald-600", dot: "#10b981" },
+  cerrado_perdido:   { light: { bg: "#fef2f2", border: "#fca5a5", text: "#b91c1c" }, dark: { bg: "rgba(127,29,29,0.2)", border: "#7f1d1d", text: "#fca5a5" }, gradient: "from-red-400 to-red-600", dot: "#ef4444" },
+  dormido:           { light: { bg: "#f9fafb", border: "#d1d5db", text: "#4b5563" }, dark: { bg: "#1f2937", border: "#374151", text: "#9ca3af" }, gradient: "from-gray-400 to-gray-600", dot: "#6b7280" },
 };
 
 const intentDots: Record<string, string> = {
@@ -252,12 +257,26 @@ interface KanbanColumnProps {
   stageLabel: string;
 }
 
+function useIsDark() {
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const check = () => setIsDark(document.documentElement.classList.contains("dark"));
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+  return isDark;
+}
+
 function KanbanColumn({ stage, leads, stageLabel }: KanbanColumnProps) {
   const { t } = useLanguage();
+  const isDark = useIsDark();
   const { setNodeRef, isOver } = useDroppable({
     id: stage.id,
   });
   const colors = stageColors[stage.id];
+  const theme = isDark ? colors.dark : colors.light;
   const totalValue = leads.reduce((sum, lead) => {
     const avg = lead.budgetMin && lead.budgetMax
       ? (lead.budgetMin + lead.budgetMax) / 2
@@ -277,28 +296,30 @@ function KanbanColumn({ stage, leads, stageLabel }: KanbanColumnProps) {
       <motion.div
         className={cn(
           "rounded-xl p-3 mb-3 border-2 transition-all duration-200",
-          colors.bg,
-          colors.border,
-          isOver && "border-violet-400 ring-2 ring-violet-400/20 shadow-lg"
+          isOver && "!border-violet-400 ring-2 ring-violet-400/20 shadow-lg"
         )}
+        style={{
+          backgroundColor: theme.bg,
+          borderColor: isOver ? undefined : theme.border,
+        }}
         animate={isOver ? { scale: 1.02 } : { scale: 1 }}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className={cn("h-3 w-3 rounded-full bg-gradient-to-br", colors.gradient)} />
-            <h3 className={cn("font-semibold text-sm", colors.text)}>{stageLabel}</h3>
-            <Badge
-              variant="secondary"
-              className={cn(
-                "h-5 px-1.5 text-xs font-semibold",
-                isOver && "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
-              )}
+            <h3 className="font-semibold text-sm" style={{ color: theme.text }}>{stageLabel}</h3>
+            <span
+              className="inline-flex items-center h-5 px-1.5 text-xs font-semibold rounded-md"
+              style={{
+                backgroundColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)",
+                color: theme.text,
+              }}
             >
               {leads.length}
-            </Badge>
+            </span>
           </div>
           {totalValue > 0 && (
-            <span className="text-xs font-medium text-slate-500">
+            <span className="text-xs font-medium" style={{ color: isDark ? "#94a3b8" : "#64748b" }}>
               ~{formatValue(totalValue)}
             </span>
           )}
