@@ -267,7 +267,7 @@ export function Header() {
             <div className="p-4 border-b border-slate-100">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-slate-900">{t.user.notifications}</h3>
-                <Button variant="ghost" size="sm" className="text-violet-600 hover:text-violet-700 h-8 px-2 text-xs">
+                <Button variant="ghost" size="sm" className="text-violet-600 hover:text-violet-700 h-8 px-2 text-xs" onClick={() => router.push("/dashboard/settings/audit")}>
                   {t.common.viewAll}
                 </Button>
               </div>
@@ -284,6 +284,7 @@ export function Header() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
+                    onClick={() => notif.href && router.push(notif.href)}
                     className={`p-4 border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors ${
                       notif.unread ? "bg-violet-50/50 dark:bg-violet-900/10" : ""
                     }`}
@@ -303,7 +304,7 @@ export function Header() {
               )}
             </div>
             <div className="p-3 border-t border-slate-100">
-              <Button variant="ghost" className="w-full text-sm text-violet-600 hover:text-violet-700 hover:bg-violet-50 rounded-lg">
+              <Button variant="ghost" className="w-full text-sm text-violet-600 hover:text-violet-700 hover:bg-violet-50 rounded-lg" onClick={() => router.push("/dashboard/settings/audit")}>
                 {t.common.viewAll}
               </Button>
             </div>

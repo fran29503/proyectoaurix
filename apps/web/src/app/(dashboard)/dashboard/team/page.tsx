@@ -42,6 +42,7 @@ import { HorizontalScroll } from "@/components/ui/horizontal-scroll";
 import { getTeamMembers, roleLabels, teamLabels, type TeamMember } from "@/lib/queries/team";
 import { useLanguage } from "@/lib/i18n";
 import { Can, ManagerOrAbove } from "@/lib/rbac";
+import { useRouter } from "next/navigation";
 
 const roleColors: Record<string, string> = {
   admin: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
@@ -99,14 +100,18 @@ function TeamMemberRow({ member }: { member: TeamMember }) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              <Mail className="mr-2 h-4 w-4" />
-              {t.common.email}
+            <DropdownMenuItem asChild>
+              <a href={`mailto:${member.email}`}>
+                <Mail className="mr-2 h-4 w-4" />
+                {t.common.email}
+              </a>
             </DropdownMenuItem>
             {member.phone && (
-              <DropdownMenuItem>
-                <Phone className="mr-2 h-4 w-4" />
-                {t.common.call}
+              <DropdownMenuItem asChild>
+                <a href={`tel:${member.phone}`}>
+                  <Phone className="mr-2 h-4 w-4" />
+                  {t.common.call}
+                </a>
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>
@@ -118,6 +123,7 @@ function TeamMemberRow({ member }: { member: TeamMember }) {
 
 export default function TeamPage() {
   const { t } = useLanguage();
+  const router = useRouter();
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -182,7 +188,7 @@ export default function TeamPage() {
           </p>
         </div>
         <Can resource="team" action="create">
-          <Button size="sm" className="bg-copper-500 hover:bg-copper-600 w-fit">
+          <Button size="sm" className="bg-copper-500 hover:bg-copper-600 w-fit" onClick={() => router.push("/dashboard/settings/users")}>
             {t.common.add}
           </Button>
         </Can>

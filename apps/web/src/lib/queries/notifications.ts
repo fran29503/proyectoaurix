@@ -67,6 +67,13 @@ export async function getNotifications(): Promise<Notification[]> {
       task: "task",
     };
 
+    const hrefMap: Record<string, string> = {
+      lead: "/dashboard/leads",
+      property: "/dashboard/properties",
+      task: "/dashboard/tasks",
+      user: "/dashboard/settings/users",
+    };
+
     return {
       id: log.id,
       title,
@@ -74,6 +81,7 @@ export async function getNotifications(): Promise<Notification[]> {
       time,
       unread: diffMin < 60,
       type: typeMap[log.resource] || "system",
+      href: hrefMap[log.resource] || "/dashboard",
     };
   });
 }
